@@ -2,13 +2,19 @@ package com.weple.cloud.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-@Controller // 반드시 최상위 클래스 바로 위에 붙어야 Spring이 인식합니다!
-public class commonController {
+@Controller
+public class CommonController {
 
-    @GetMapping("/weple/common")
-    public String wepleCommon() {
-        // src/main/resources/templates/weple/common.html 파일을 찾아갑니다.
-        return "weple/common"; 
+    @GetMapping("/")
+    public String home() {
+        return "weple/common";
+    }
+
+    @GetMapping("/{page}.html")
+    public String page(@PathVariable String page) {
+        return "dashboard/" + page;
     }
 }
+
