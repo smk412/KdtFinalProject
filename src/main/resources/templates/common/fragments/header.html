@@ -4,7 +4,8 @@
 <body>
 <div th:fragment="headerFragment" class="nav_menu" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 20px; box-sizing: border-box;">
     
-    <h1 class="header-title-left" style="margin: 0;">프로젝트 1</h1>
+    <!-- [수정] 글씨가 없어도 공백(&nbsp;)을 넣어 기존 'WEPLE' 글자가 있던 만큼의 물리적인 볼륨을 유지합니다 -->
+    <h1 class="header-title-left" style="margin: 0; font-size: 24px; line-height: 1.2;">&nbsp;</h1>
     
     <div class="header-profile-right" style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
         
