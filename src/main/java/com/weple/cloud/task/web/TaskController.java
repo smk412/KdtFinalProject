@@ -7,10 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.weple.cloud.auth.service.LoginUserDetails;
+import com.weple.cloud.task.service.TaskProjectSelectVO;
 import com.weple.cloud.task.service.TaskService;
 import com.weple.cloud.task.service.TaskVO;
 
@@ -18,13 +18,12 @@ import lombok.RequiredArgsConstructor;
 
 
 @Controller
-@RequestMapping("/project")
 @RequiredArgsConstructor
 public class TaskController {
     
 	private final TaskService taskService;
 	
-	@GetMapping("/task")
+	@GetMapping("/project/task")
     public String projectTaskList(@RequestParam("projectId") Long pId,Model model) {
 		
 
@@ -34,7 +33,7 @@ public class TaskController {
         return "weple/task/list";
     }
 	
-	@GetMapping("/task/insert")
+	@GetMapping("/project/task/insert")
     public String projectTaskListInsert(@RequestParam("projectId") Long pId,@AuthenticationPrincipal LoginUserDetails loginUser,Model model) {
 		String userCode = loginUser.getLoginUser().getUserCode();
 	    Long companyId = loginUser.getLoginUser().getCompanyId();
@@ -57,7 +56,7 @@ public class TaskController {
         return "weple/task/register";
     }
 	
-	@PostMapping("/task/insert")
+	@PostMapping("/project/task/insert")
 	public String taskInsertProcess(@RequestParam("projectId") Long pId,@AuthenticationPrincipal LoginUserDetails loginUser,TaskVO taskVO) {
 		String userCode = loginUser.getLoginUser().getUserCode();
 	    // 프로젝트 선택하는 부분 없어서 정적값 1로 대체
@@ -71,6 +70,18 @@ public class TaskController {
 	    System.out.println("VO 내부의 담당자(taskManager): " + taskVO.getTaskManager());
 	    
 	    return "redirect:/project/task?projectId=" + pId;
+	}
+	
+	
+	@GetMapping("/task/all-list")
+	public String allTaskList(@AuthenticationPrincipal LoginUserDetails loginUser , Model model) {
+		String userCode = loginUser.getLoginUser().getUserCode();
+		List<TaskVO> list = taskService.findAllList(userCode);
+		List<TaskProjectSelectVO> projectList = taskService.findMyProject(userCode);
+		model.addAttribute("allList",list);
+		model.addAttribute("projectList",projectList);
+		return "weple/task/all-list";
+		
 	}
 
 

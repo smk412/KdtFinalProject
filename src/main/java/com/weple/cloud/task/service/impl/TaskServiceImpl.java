@@ -9,6 +9,7 @@ import com.weple.cloud.task.mapper.TaskMapper;
 import com.weple.cloud.task.service.TaskMemberVO;
 import com.weple.cloud.task.service.TaskParentVO;
 import com.weple.cloud.task.service.TaskPriorityVO;
+import com.weple.cloud.task.service.TaskProjectSelectVO;
 import com.weple.cloud.task.service.TaskService;
 import com.weple.cloud.task.service.TaskStatusVO;
 import com.weple.cloud.task.service.TaskTypeListVO;
@@ -56,6 +57,17 @@ public class TaskServiceImpl implements TaskService {
     public int insertTask(TaskVO taskVO) {
         return taskMapper.insertTask(taskVO);
     }
+
+	@Override
+	public List<TaskVO> findAllList(String tManager) {
+		
+		return taskMapper.selectAllList(tManager);
+	}
+
+	@Override
+	public List<TaskProjectSelectVO> findMyProject(String uCode) {
+		return taskMapper.myAllTasks(uCode);
+	}
 
 
 }
