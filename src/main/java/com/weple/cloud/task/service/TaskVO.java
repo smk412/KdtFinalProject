@@ -33,19 +33,19 @@ public class TaskVO {
     @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private LocalDate finishDate;  
     
-    private Integer estimatedTime; 
-    private Integer taskProgress;
+    private Long estimatedTime; 
+    private Long taskProgress;
     private String parentTaskId; 
-    private Integer spentHoursSum;
+    private Long spentHoursSum;
     
     @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private LocalDateTime updatedAt; 
-    private Integer milestoneId; 
+    private Long milestoneId; 
     private Long projectId;   
     private String userCode; 
-    private Integer typeId;
+    private Long typeId;
     
     // 조인용 필드
     private String projectTitle;
@@ -58,4 +58,5 @@ public class TaskVO {
     
     // 상세조회시 필요 필드
     private String taskWriter;    // 일감 등록자 이름 (u_writer.user_name)
+    private String milestoneTitle;
 }

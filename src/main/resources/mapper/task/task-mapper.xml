@@ -108,24 +108,30 @@
        		   c.default_describe AS taskStatus,
        		   t.priority, 
        		   u_mgr.user_name AS taskManager,
-       		   t.start_date, 
-       		   t.finish_date, 
-       		   t.estimated_time,
-       		   t.task_progress,
-       		   t.parent_task_id,
-       		   t.spent_hours_sum,
-       		   t.created_at,
-       		   t.updated_at,
-       		   t.milestone_id,
-       		   t.project_id, 
+       		   t.start_date AS startDate, 
+       		   t.finish_date AS finishDate, 
+       		   t.estimated_time AS estimatedTime,
+       		   t.task_progress AS taskProgress,
+       		   t.parent_task_id AS parentTaskId,
+       		   t.spent_hours_sum AS spentHoursSum,
+       		   t.created_at AS createdAt,
+       		   t.updated_at AS updatedAt,
+       		   m.milestone_title AS milestoneTitle,
+       		   t.project_id AS projectId, 
        		   u_writer.user_name AS taskWriter,
        		   tt.type_name AS typeIdName
 		FROM task t
      		   JOIN common_code c ON t.task_status = c.common_id
      		   JOIN task_types tt ON t.type_id = tt.type_id
+               LEFT JOIN milestone m ON t.milestone_id = m.milestone_id
      		   LEFT JOIN users u_mgr ON t.task_manager = u_mgr.user_code
      		   LEFT JOIN users u_writer ON t.user_code = u_writer.user_code
 		WHERE t.task_id = #{tId}
+	</select>
+	<select id="childTask" resultType="TaskVO">			
+		SELECT task_title , task_id
+		FROM task
+		WHERE parent_task_id = #{tId}
 	</select>
 	<select id="selectAllList" resultType="TaskVO"> 
 		SELECT
@@ -158,5 +164,9 @@
 			members m JOIN project p ON m.project_id = p.project_id
 		WHERE m.user_code = #{uCode}
 	</select>
+	
+	
+	
+
 
 </mapper>

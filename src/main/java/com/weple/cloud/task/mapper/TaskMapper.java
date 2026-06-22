@@ -34,6 +34,8 @@ public interface TaskMapper {
     
     public TaskVO taskDetail(@Param("tId") String tId);
     
+    public List<TaskVO>childTask(@Param("tId") String tId);
+    
     public List<TaskProjectSelectVO> myAllTasks(@Param("uCode") String uCode);
 
 }

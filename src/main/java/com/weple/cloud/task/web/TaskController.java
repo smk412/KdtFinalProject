@@ -39,6 +39,8 @@ public class TaskController {
 		String userCode = loginUser.getLoginUser().getUserCode();
 	    Long companyId = loginUser.getLoginUser().getCompanyId();
 	    
+	    //nav 일감 돌아가기 위해서 projectId 넘김
+		model.addAttribute("projectId",pId);
 	    //내게 할당에서 현재 로그인 정보 확인
 	    model.addAttribute("loginUserCode",userCode);
 		
@@ -66,18 +68,20 @@ public class TaskController {
 	    taskVO.setUserCode(userCode); 
 
 	    taskService.insertTask(taskVO);
-	    System.out.println("화면에서 넘어온 TaskVO 데이터: " + taskVO.toString());
-	    System.out.println("VO 내부의 담당자(taskManager): " + taskVO.getTaskManager());
+
 	    
 	    return "redirect:/project/task?projectId=" + pId;
 	}
 	
 	@GetMapping("/project/task/detail/{tId}")
-	public String taskDetail(@PathVariable("tId") String tId,@AuthenticationPrincipal LoginUserDetails loginUser,Model model,TaskVO taskVO) {
+	public String taskDetail(@PathVariable("tId") String tId,@RequestParam("projectId") Long pId,@AuthenticationPrincipal LoginUserDetails loginUser,Model model,TaskVO taskVO) {
 			
 		TaskVO taskDetail = taskService.findTaskDetail(tId);
+		List<TaskVO> childTaskList = taskService.findChildTask(tId);
 		model.addAttribute("currentMenu", "task");
+		model.addAttribute("projectId",pId);
 		model.addAttribute("taskDetail",taskDetail);
+		model.addAttribute("chlidTaskList",childTaskList);
 		return "weple/task/detail";
 	}
 	
