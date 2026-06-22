@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weple.cloud.milestone.mapper.MilestoneMapper">
+	<resultMap id="MilestoneResultMap" type="MilestoneVO">
+        <id property="milestoneId" column="milestone_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="loginId" column="login_id"/>
+        <result property="milestoneTitle" column="milestone_title"/>
+        <result property="milestoneDescribe" column="milestone_describe"/>
+        <result property="finishDate" column="finish_date"/>
+        <result property="milestoneStatus" column="milestone_status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectMilestoneAll" resultMap="MilestoneResultMap">
+        SELECT 
+            milestone_id, 
+            project_id, 
+            login_id, 
+            milestone_title, 
+            milestone_describe, 
+            finish_date, 
+            milestone_status, 
+            created_at,
+            updated_at
+        FROM milestone
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectMilestoneById" parameterType="java.lang.Integer" resultMap="MilestoneResultMap">
+        SELECT 
+            milestone_id, 
+            project_id, 
+            login_id, 
+            milestone_title, 
+            milestone_describe, 
+            finish_date, 
+            milestone_status, 
+            created_at,
+            updated_at
+        FROM milestone
+        WHERE milestone_id = #{milestoneId}
+    </select>
+
+    <insert id="insertMilestone" parameterType="MilestoneVO">
+        INSERT INTO milestone (
+            milestone_id, 
+            project_id, 
+            login_id, 
+            milestone_title, 
+            milestone_describe, 
+            finish_date, 
+            milestone_status, 
+            created_at,
+            updated_at
+        ) VALUES (
+            #{milestoneId}, #{projectId},
+            #{loginId},
+            #{milestoneTitle},
+            #{milestoneDescribe},
+            #{finishDate, jdbcType=DATE},
+            #{milestoneStatus},
+            SYSDATE,
+            NULL
+        )
+    </insert>
+
+    <update id="updateMilestone" parameterType="MilestoneVO">
+        UPDATE milestone
+        SET 
+            milestone_title = #{milestoneTitle},
+            milestone_describe = #{milestoneDescribe},
+            finish_date = #{finishDate, jdbcType=DATE},
+            milestone_status = #{milestoneStatus},
+            updated_at = SYSDATE
+        WHERE milestone_id = #{milestoneId}
+    </update>
+
+    <delete id="deleteMilestone" parameterType="int">
+        DELETE FROM milestone
+        WHERE milestone_id = #{milestoneId}
+    </delete>
+</mapper>

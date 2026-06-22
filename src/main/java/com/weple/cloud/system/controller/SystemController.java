@@ -181,13 +181,13 @@ public class SystemController {
 	}
 
 	// 등록페이지 조회
-	@GetMapping("/system/taskType/Insert")
+	@GetMapping("/system/taskType/insert")
 	public String taskTypeInsert() {
 		return "weple/system/taskType/register";
 	}
 
 	// 등록하기
-	@PostMapping("/system/taskType/Insert")
+	@PostMapping("/system/taskType/insert")
 	public String systemTaskTypeInsert(@AuthenticationPrincipal LoginUserDetails loginUser, TaskTypeVO taskTypeVO) {
 		Long companyId = loginUser.getLoginUser().getCompanyId();
 		taskTypeVO.setCompanyId(companyId);
@@ -196,7 +196,7 @@ public class SystemController {
 	}
 
 	// 순서 수정하기 (드래그&드랍으로 변경된 순서)
-	@PostMapping("/system/taskType/Reorder")
+	@PostMapping("/system/taskType/reorder")
 	@ResponseBody
 	public ResponseEntity<String> systemTaskTypeReorder(@RequestBody List<Integer> sortedIds) {
 		taskTypeService.reorderTaskTypes(sortedIds);
@@ -204,7 +204,7 @@ public class SystemController {
 	}
 
 	// 수정페이지 조회
-	@GetMapping("/system/taskType/Update")
+	@GetMapping("/system/taskType/update")
 	public String taskTypeUpdate(@RequestParam("typeId") int typeId, Model model) {
 		TaskTypeVO taskType = taskTypeService.findTaskTypeById(typeId);
 		model.addAttribute("taskType", taskType);
@@ -212,14 +212,14 @@ public class SystemController {
 	}
 
 	// 수정하기
-	@PostMapping("/system/taskType/Update")
+	@PostMapping("/system/taskType/update")
 	public String systemTaskTypeUpdate(TaskTypeVO taskTypeVO) {
 		taskTypeService.updateTaskType(taskTypeVO);
 		return "redirect:/system/taskType";
 	}
 	
 	// 삭제하기
-	@PostMapping("/system/taskType/Delete/{typeId}")
+	@PostMapping("/system/taskType/delete/{typeId}")
 	@ResponseBody
 	public ResponseEntity<String> systemTaskTypeDelete(@PathVariable("typeId") int typeId) {
 		taskTypeService.deleteTaskType(typeId);
