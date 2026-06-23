@@ -3,19 +3,16 @@
 <head></head>
 <body>
 <div th:fragment="navbarFragment" class="sub_menu_nav" th:if="${currentMenu != 'none' and sidebarMenu != 'system'}">
-    <ul>
-        <li th:if="${moduleNames != null and #lists.contains(moduleNames, 'b1')}"
-        	th:classappend="${currentMenu == 'overview'} ? 'active' : ''">
-        	<a href="#">개요</a>
-        </li>
         
+    <ul>        
         <li th:if="${moduleNames != null and #lists.contains(moduleNames, 'b2')}"
         	th:classappend="${currentMenu == 'worklog'} ? 'active' : ''">
         	<a th:href="@{/project/worklog(projectId=${projectId})}">작업내역</a>
         </li>
         
-        <li th:if="${moduleNames != null and #lists.contains(moduleNames, 'b3')}">
-        	<a href="#">마일스톤</a>
+        <li th:if="${moduleNames != null and #lists.contains(moduleNames, 'b3')}"
+            th:classappend="${currentMenu == 'milestone'} ? 'active' : ''">
+          <a th:href="@{/project/milestone(projectId=${projectId})}">마일스톤</a>
         </li>
         
         <li th:if="${moduleNames != null and #lists.contains(moduleNames, 'b4')}"
