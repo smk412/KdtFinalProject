@@ -122,55 +122,75 @@
     <result property="projectId" column="projectId"/>
     <result property="taskWriter" column="taskWriter"/>
     <result property="typeIdName" column="typeIdName"/>
-    
     <result property="milestoneId" column="milestoneId"/>
     <result property="parentTaskTitle" column="parentTaskTitle"/>
     <result property="taskStatusId" column="taskStatusId"/>
     <result property="taskManagerId" column="taskManagerId"/>
     
+    <!-- 파일 리스트 -->
     <collection property="fileList" ofType="TaskFileVO">
+    <result property="fileId" column="fileId"/>
         <result property="logicalName" column="logicalName"/>
-        <result property="fileSize" column="fileSize"/> 
+        <result property="fileSize" column="fileSize"/>
+        <result property="versionNumber" column="versionNumber"/> 
         <result property="uploadedAt" column="uploadedAt"/>
     </collection>
 </resultMap>
 
 <select id="taskDetail" resultMap="taskDetailMap">
-    SELECT t.task_id AS taskId, 
-           t.task_title AS taskTitle, 
-           t.task_describe AS taskDescribe, 
-           c.default_describe AS taskStatus,          
-           t.task_status AS taskStatusId,             
-           t.priority, 
-           u_mgr.user_name AS taskManager,            
-           t.task_manager AS taskManagerId,           
-           t.start_date AS startDate, 
-           t.finish_date AS finishDate, 
-           t.estimated_time AS estimatedTime,
-           t.task_progress AS taskProgress,
-           t.parent_task_id AS parentTaskId,
-           p.task_title AS parentTaskTitle,           
-           t.spent_hours_sum AS spentHoursSum,
-           t.created_at AS createdAt,
-           t.updated_at  AS updatedAt,
-           t.milestone_id AS milestoneId,             
-           m.milestone_title AS milestoneTitle,
-           t.project_id AS projectId, 
-           u_writer.user_name AS taskWriter,
-           tt.type_name AS typeIdName,
-           f.logical_name AS logicalName,
-           fv.file_size AS fileSize ,
-           fv.uploaded_at  AS uploadedAt
-      FROM task t
-      	JOIN common_code c ON t.task_status = c.common_id
-      	JOIN task_types tt ON t.type_id = tt.type_id
-      	LEFT JOIN task p ON t.parent_task_id = p.task_id        
-      	LEFT JOIN milestone m ON t.milestone_id = m.milestone_id
-      	LEFT JOIN users u_mgr ON t.task_manager = u_mgr.user_code
-      	LEFT JOIN users u_writer ON t.user_code = u_writer.user_code
-      	LEFT JOIN files f ON t.task_id = f.task_id
-      	LEFT JOIN file_versions fv ON f.file_id = fv.file_id 
-     WHERE t.task_id = #{tId}
+	SELECT t.task_id AS taskId, 
+       t.task_title AS taskTitle, 
+       t.task_describe AS taskDescribe, 
+       c.default_describe AS taskStatus,          
+       t.task_status AS taskStatusId,             
+       t.priority, 
+       u_mgr.user_name AS taskManager,            
+       t.task_manager AS taskManagerId,           
+       t.start_date AS startDate, 
+       t.finish_date AS finishDate, 
+       t.estimated_time AS estimatedTime,
+       t.task_progress AS taskProgress,
+       t.parent_task_id AS parentTaskId,
+       p.task_title AS parentTaskTitle,           
+       t.spent_hours_sum AS spentHoursSum,
+       t.created_at AS createdAt,
+       t.updated_at AS updatedAt,
+       t.milestone_id AS milestoneId,             
+       m.milestone_title AS milestoneTitle,
+       t.project_id AS projectId, 
+       u_writer.user_name AS taskWriter,
+       tt.type_name AS typeIdName,
+       
+
+       f.file_id AS fileId,
+       f.logical_name AS logicalName,
+       fv.version_number AS versionNumber,
+       fv.file_size AS fileSize,
+       fv.uploaded_at AS uploadedAt
+       
+  FROM task t
+  	JOIN common_code c ON t.task_status = c.common_id
+  	JOIN task_types tt ON t.type_id = tt.type_id
+  	LEFT JOIN task p ON t.parent_task_id = p.task_id        
+  	LEFT JOIN milestone m ON t.milestone_id = m.milestone_id
+  	LEFT JOIN users u_mgr ON t.task_manager = u_mgr.user_code
+  	LEFT JOIN users u_writer ON t.user_code = u_writer.user_code
+  
+  	LEFT JOIN files f 
+        ON t.task_id = f.task_id 
+        AND f.is_deleted = 'N'
+        
+  	LEFT JOIN (
+      SELECT file_id, 
+             version_number, 
+             file_size, 
+             uploaded_at,
+             ROW_NUMBER() OVER (PARTITION BY file_id ORDER BY version_number DESC) AS rn
+        FROM file_versions
+  		) fv 
+         	ON f.file_id = fv.file_id 
+        	AND fv.rn = 1
+ 	WHERE t.task_id = #{tId}
 </select>
 	<select id="childTask" resultType="TaskVO">			
 		SELECT task_title , task_id
@@ -208,6 +228,9 @@
 			members m JOIN project p ON m.project_id = p.project_id
 		WHERE m.user_code = #{uCode}
 	</select>
+	
+	
+	
 <update id="updateTask" parameterType="TaskVO">
     UPDATE task
        SET type_id = (SELECT MAX(type_id) FROM task_types WHERE type_name = #{typeIdName, jdbcType=VARCHAR}),

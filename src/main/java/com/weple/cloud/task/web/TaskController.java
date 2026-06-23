@@ -64,7 +64,10 @@ public class TaskController {
     }
 	
 	@PostMapping("/project/task/insert")
-	public String taskInsertProcess(@RequestParam("projectId") Long pId,@AuthenticationPrincipal LoginUserDetails loginUser,TaskVO taskVO,@RequestParam(value = "files", required = false) List<MultipartFile> files)throws Exception {
+	public String taskInsertProcess(@RequestParam("projectId") Long pId,
+									@AuthenticationPrincipal LoginUserDetails loginUser,
+									TaskVO taskVO,
+									@RequestParam(value = "files", required = false) List<MultipartFile> files)throws Exception {
 		String userCode = loginUser.getLoginUser().getUserCode();
 	    taskVO.setProjectId(pId); 
 	    taskVO.setUserCode(userCode); 
@@ -139,21 +142,20 @@ public class TaskController {
 	                                TaskVO taskVO,
 	                                @RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception {
 	    
-	    // 프로젝트 ID 설정
 		String userCode = loginUser.getLoginUser().getUserCode();
 	    taskVO.setProjectId(pId);
 	    taskVO.setUserCode(userCode); 
 
 
-	    // 수정 처리 서비스 호출 (VO 내부에 taskId가 hidden으로 담겨서 넘어옵니다)
 	    taskService.updateTask(taskVO, files);
 	    
 	    // 수정 완료 후 해당 일감의 상세조회 페이지로 리다이렉트
 	    return "redirect:/project/task/detail/" + taskVO.getTaskId() + "?projectId=" + pId;
 	}
 	
-	@DeleteMapping("/project/task/delete")
+	@PostMapping("/project/task/delete/{tId}")
 	public String taskDeleteProcess(@RequestParam("projectId") Long pId,@PathVariable("tId") String tId) {
+		taskService.deleteTask(tId);
 		return "redirect:/project/task" + "?projectId=" +pId;
 		
 	}
