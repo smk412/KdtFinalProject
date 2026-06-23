@@ -18,6 +18,7 @@
         <result property="totalTaskCount" column="total_task_count"/>
         <result property="closedTaskCount" column="closed_task_count"/>
         <result property="progressPercentage" column="progress_percentage"/>
+        <result property="delayDays" column="delay_days"/>
         
         <collection property="recentTasks" ofType="TaskVO">
             <id property="taskId" column="task_id"/>
@@ -47,6 +48,13 @@
         NVL(stats.total_count, 0) AS total_task_count,
         NVL(stats.closed_count, 0) AS closed_task_count,
         NVL(stats.avg_progress, 0) AS progress_percentage,
+        
+        CASE 
+            WHEN NVL(stats.avg_progress, 0) &lt; 100 AND TRUNC(SYSDATE) > TRUNC(m.finish_date)
+            THEN TRUNC(SYSDATE) - TRUNC(m.finish_date)
+            ELSE 0 
+        END AS delay_days,
+        
         t.task_id, 
         t.task_title, 
         t.task_progress, 
