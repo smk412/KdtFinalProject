@@ -1,7 +1,9 @@
 package com.weple.cloud.system.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -318,11 +320,15 @@ public class SystemController {
 
 	// 등록 처리
 	@PostMapping("codeInsert")
-	public String codeInsertProcess(CodeValueVO codeValueVO, @RequestParam("type") String type, HttpServletRequest request) {
+	public String codeInsertProcess(@ModelAttribute("CodeValue") CodeValueVO codeValueVO, @RequestParam("type") String type, Model model) {
 		// 임시로 회사 ID를 1로 세팅
 		codeValueVO.setCompanyId(1);
-		codeValueVO.setUsingYn(request.getParameter("usingYn") != null ? "Y" : "N");
-	    codeValueVO.setDefaultYn(request.getParameter("defaultYn") != null ? "Y" : "N");
+	    codeValueVO.setUsingYn(codeValueVO.getUsingYn() != null ? "Y" : "N");
+	    codeValueVO.setDefaultYn(codeValueVO.getDefaultYn() != null ? "Y" : "N");
+	    if ("Y".equals(codeValueVO.getDefaultYn())) {
+	        codeValueService.resetAllDefaultYn(type); 
+	    }
+	    
 		codeValueService.addCodeValue(codeValueVO, type);
 		return "redirect:codeValueList";
 	}
