@@ -24,7 +24,7 @@
 			common_code cc ON t.task_status = cc.common_id
 		LEFT JOIN
 			users u ON t.task_manager = u.user_code
-		WHERE t.project_id = #{pId}
+		WHERE t.project_id = #{pId} AND deleted_yn ='N'
 		ORDER BY createdAt DESC
 	</select>
 	<select id="taskTypes" resultType="TaskTypeListVO"> <!-- 일감등록 일감유형 목록 조회 -->
@@ -45,6 +45,7 @@
 	<select id="taskMembers" resultType="TaskMemberVO"> <!-- 일감등록 현재 선택된 프로젝트 참여자 목록 조회 -->
 		SELECT 
 			u.user_code AS userCode,
+			u.email AS email,
 			u.user_name AS userName
 		FROM members m
 			INNER JOIN users u ON m.user_code = u.user_code
@@ -122,55 +123,75 @@
     <result property="projectId" column="projectId"/>
     <result property="taskWriter" column="taskWriter"/>
     <result property="typeIdName" column="typeIdName"/>
-    
     <result property="milestoneId" column="milestoneId"/>
     <result property="parentTaskTitle" column="parentTaskTitle"/>
     <result property="taskStatusId" column="taskStatusId"/>
     <result property="taskManagerId" column="taskManagerId"/>
     
+    <!-- 파일 리스트 -->
     <collection property="fileList" ofType="TaskFileVO">
+    <result property="fileId" column="fileId"/>
         <result property="logicalName" column="logicalName"/>
-        <result property="fileSize" column="fileSize"/> 
+        <result property="fileSize" column="fileSize"/>
+        <result property="versionNumber" column="versionNumber"/> 
         <result property="uploadedAt" column="uploadedAt"/>
     </collection>
 </resultMap>
 
 <select id="taskDetail" resultMap="taskDetailMap">
-    SELECT t.task_id AS taskId, 
-           t.task_title AS taskTitle, 
-           t.task_describe AS taskDescribe, 
-           c.default_describe AS taskStatus,          
-           t.task_status AS taskStatusId,             
-           t.priority, 
-           u_mgr.user_name AS taskManager,            
-           t.task_manager AS taskManagerId,           
-           t.start_date AS startDate, 
-           t.finish_date AS finishDate, 
-           t.estimated_time AS estimatedTime,
-           t.task_progress AS taskProgress,
-           t.parent_task_id AS parentTaskId,
-           p.task_title AS parentTaskTitle,           
-           t.spent_hours_sum AS spentHoursSum,
-           t.created_at AS createdAt,
-           t.updated_at  AS updatedAt,
-           t.milestone_id AS milestoneId,             
-           m.milestone_title AS milestoneTitle,
-           t.project_id AS projectId, 
-           u_writer.user_name AS taskWriter,
-           tt.type_name AS typeIdName,
-           f.logical_name AS logicalName,
-           fv.file_size AS fileSize ,
-           fv.uploaded_at  AS uploadedAt
-      FROM task t
-      	JOIN common_code c ON t.task_status = c.common_id
-      	JOIN task_types tt ON t.type_id = tt.type_id
-      	LEFT JOIN task p ON t.parent_task_id = p.task_id        
-      	LEFT JOIN milestone m ON t.milestone_id = m.milestone_id
-      	LEFT JOIN users u_mgr ON t.task_manager = u_mgr.user_code
-      	LEFT JOIN users u_writer ON t.user_code = u_writer.user_code
-      	LEFT JOIN files f ON t.task_id = f.task_id
-      	LEFT JOIN file_versions fv ON f.file_id = fv.file_id 
-     WHERE t.task_id = #{tId}
+	SELECT t.task_id AS taskId, 
+       t.task_title AS taskTitle, 
+       t.task_describe AS taskDescribe, 
+       c.default_describe AS taskStatus,          
+       t.task_status AS taskStatusId,             
+       t.priority, 
+       u_mgr.user_name AS taskManager,            
+       t.task_manager AS taskManagerId,           
+       t.start_date AS startDate, 
+       t.finish_date AS finishDate, 
+       t.estimated_time AS estimatedTime,
+       t.task_progress AS taskProgress,
+       t.parent_task_id AS parentTaskId,
+       p.task_title AS parentTaskTitle,           
+       t.spent_hours_sum AS spentHoursSum,
+       t.created_at AS createdAt,
+       t.updated_at AS updatedAt,
+       t.milestone_id AS milestoneId,             
+       m.milestone_title AS milestoneTitle,
+       t.project_id AS projectId, 
+       u_writer.user_name AS taskWriter,
+       tt.type_name AS typeIdName,
+       
+
+       f.file_id AS fileId,
+       f.logical_name AS logicalName,
+       fv.version_number AS versionNumber,
+       fv.file_size AS fileSize,
+       fv.uploaded_at AS uploadedAt
+       
+  FROM task t
+  	JOIN common_code c ON t.task_status = c.common_id
+  	JOIN task_types tt ON t.type_id = tt.type_id
+  	LEFT JOIN task p ON t.parent_task_id = p.task_id        
+  	LEFT JOIN milestone m ON t.milestone_id = m.milestone_id
+  	LEFT JOIN users u_mgr ON t.task_manager = u_mgr.user_code
+  	LEFT JOIN users u_writer ON t.user_code = u_writer.user_code
+  
+  	LEFT JOIN files f 
+        ON t.task_id = f.task_id 
+        AND f.is_deleted = 'N'
+        
+  	LEFT JOIN (
+      SELECT file_id, 
+             version_number, 
+             file_size, 
+             uploaded_at,
+             ROW_NUMBER() OVER (PARTITION BY file_id ORDER BY version_number DESC) AS rn
+        FROM file_versions
+  		) fv 
+         	ON f.file_id = fv.file_id 
+        	AND fv.rn = 1
+ 	WHERE t.task_id = #{tId}
 </select>
 	<select id="childTask" resultType="TaskVO">			
 		SELECT task_title , task_id
@@ -198,7 +219,7 @@
 			common_code cc ON t.task_status = cc.common_id
 		LEFT JOIN
 			users u ON t.task_manager = u.user_code
-		WHERE t.task_manager = #{tManager}
+		WHERE t.task_manager = #{tManager} AND deleted_yn ='N'
 		ORDER BY createdAt DESC
 	</select>
 	<select id="myAllTasks" resultType="TaskProjectSelectVO">
@@ -206,8 +227,11 @@
 			m.project_id , p.project_title
 		FROM 
 			members m JOIN project p ON m.project_id = p.project_id
-		WHERE m.user_code = #{uCode}
+		WHERE m.user_code = #{uCode} AND deleted_yn ='N'
 	</select>
+	
+	
+	
 <update id="updateTask" parameterType="TaskVO">
     UPDATE task
        SET type_id = (SELECT MAX(type_id) FROM task_types WHERE type_name = #{typeIdName, jdbcType=VARCHAR}),
@@ -226,8 +250,26 @@
      WHERE task_id = #{taskId}
 </update>
 
-<delete id="deleteTask">
-	DELETE FROM task WHERE task_id = #{tId} <!-- 권한에 따라 사용자는 삭제 버튼 안보이게 하던가 아니면 연결된 권한 쪽 확인해서 일감 삭제 권한 있는지 확인하고 해당 쿼리 실행할수 있도록 -->
-</delete>
+<update id="deleteTask">
+    UPDATE task
+       SET deleted_yn = 'Y'
+     WHERE task_id = #{tId}
+</update>
+
+<select id="taskCommentList" resultType="TaskCommentVO">
+	SELECT tc.comment_id AS commentId ,
+        tc.task_id taskId,
+        tc.parent_comment_id parentCommentId,
+        tc.user_code userCode,
+        u.user_name userName,
+        u.profile_image profileImage,
+        tc.task_comment taskComment,
+        tc.created_at AS createdAt
+	FROM task_comment tc JOIN users u ON tc.user_code = u.user_code
+	WHERE task_id = #{tId}
+	ORDER BY tc.comment_id ASC
+</select>
+
+
 
 </mapper>
