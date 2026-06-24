@@ -1,8 +1,6 @@
 package com.weple.cloud.file;
 
 
-
-
 import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,8 +13,10 @@ import lombok.ToString;
 @Getter
 @ToString
 public class TaskFileVO {
-	public String logicalName;
-    public Long fileSize;
+	private String fileId;
+	private String logicalName;
+    private Long fileSize;
+    private Long versionNumber;
     @JsonFormat(pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
-    public Date uploadedAt;
+    private Date uploadedAt;
 }
