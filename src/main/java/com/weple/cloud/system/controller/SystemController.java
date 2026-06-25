@@ -3,6 +3,7 @@ package com.weple.cloud.system.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import com.weple.cloud.system.service.SystemProjectService;
 import com.weple.cloud.system.service.SystemProjectVO;
 import com.weple.cloud.system.service.TaskTypeService;
 import com.weple.cloud.system.service.TaskTypeVO;
+import com.weple.cloud.system.service.UserManagementCreateVO;
 import com.weple.cloud.system.service.UserService;
 import com.weple.cloud.system.service.UserManagementService;
 
@@ -580,19 +582,56 @@ public class SystemController {
 		return "weple/admin/user/list";
 	}
 
+	// 신규 사용자 등록 화면으로 이동합니다.
+	@GetMapping("/userList/insert")
+	public String userManagementInsertForm(Model model) {
+		model.addAttribute("sidebarMenu", "system");
+		model.addAttribute("currentMenu", "systemuser");
+		model.addAttribute("menu", "user");
+		return "weple/admin/user/insert";
+	}
+
+	// 화면에서 입력한 신규 사용자 정보를 현재 관리자의 회사 사용자로 등록합니다.
+	@PostMapping("/userList/insert")
+	public String userManagementInsert(@AuthenticationPrincipal LoginUserDetails loginUser,
+			@ModelAttribute UserManagementCreateVO user,
+			RedirectAttributes redirectAttributes) {
+		try {
+			int actorOwnerYn = Integer.valueOf(1).equals(loginUser.getLoginUser().getOwnerYn()) ? 1 : 0;
+			userManagementService.createUser(loginUser.getLoginUser().getCompanyId(), actorOwnerYn, user);
+			redirectAttributes.addFlashAttribute("userSuccess", "신규 사용자가 등록되었습니다.");
+			return "redirect:/userList";
+		} catch (IllegalArgumentException | IllegalStateException ex) {
+			redirectAttributes.addFlashAttribute("userError", ex.getMessage());
+			redirectAttributes.addFlashAttribute("userForm", user);
+			return "redirect:/userList/insert";
+		}
+	}
+
 	// 상태 스위치는 a2(활성)와 a3(비활성) 값만 받아 같은 회사 사용자 상태를 변경합니다.
 	@PostMapping("/userList/{userCode}/status")
-	public String changeUserStatus(@AuthenticationPrincipal LoginUserDetails loginUser,
+	public Object changeUserStatus(@AuthenticationPrincipal LoginUserDetails loginUser,
 			@PathVariable String userCode,
 			@RequestParam String status,
 			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(required = false) String keyword,
+			HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
+		boolean ajaxRequest = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
 		try {
 			int actorOwnerYn = Integer.valueOf(1).equals(loginUser.getLoginUser().getOwnerYn()) ? 1 : 0;
 			userManagementService.changeUserStatus(loginUser.getLoginUser().getCompanyId(), actorOwnerYn, userCode, status);
+			if (ajaxRequest) {
+				return ResponseEntity.ok(Map.of(
+						"status", status,
+						"message", "a2".equals(status) ? "활성화되었습니다." : "비활성화되었습니다."));
+			}
 			redirectAttributes.addFlashAttribute("userSuccess", "사용자 상태가 변경되었습니다.");
 		} catch (IllegalArgumentException ex) {
+			if (ajaxRequest) {
+				return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+			}
 			redirectAttributes.addFlashAttribute("userError", ex.getMessage());
 		}
 		String searchParameter = keyword == null || keyword.isBlank()
