@@ -1,6 +1,5 @@
 package com.weple.cloud.time.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.weple.cloud.admin.service.UserService;
+import com.weple.cloud.admin.service.UserVO;
 import com.weple.cloud.project.service.ProjectService;
 import com.weple.cloud.project.service.ProjectVO;
 import com.weple.cloud.system.service.CodeValueService;
@@ -31,6 +32,7 @@ public class TimeController {
 	private final ProjectService projectService;
 	private final CodeValueService codeValueService;
 	private final TimeService timeService;
+	private final UserService userService;
 
 	// -------------------------------프로젝트 내 소요시간------------------------------
 	// 전체조회
@@ -53,39 +55,49 @@ public class TimeController {
 	@GetMapping("/insertProjectTime")
 	public String insertProjectTimeForm(@RequestParam(value="projectId", required=false) Long projectId, Model model) {
 		List<ProjectVO> projectList = projectService.findAll("");
-		//projectId가 없을 경우 첫 번째 프로젝트 선택
-		if (projectId == null && projectList != null && !projectList.isEmpty()) {
-	        projectId = projectList.get(0).getProjectId();
-	    }
 		
-		// 현재 선택된 projectId로 프로젝트 정보 조회
-		if (projectId != null) {
-			ProjectVO currentProject = projectService.findById(String.valueOf(projectId));
-			model.addAttribute("currentProject", currentProject);
+	    // 프로젝트 조회, 만약 조회 결과가 없으면 빈 객체라도 생성
+	    ProjectVO currentProject = (projectId != null) ? projectService.findById(String.valueOf(projectId)) : null;
+	    if (currentProject == null) {
+	        currentProject = new ProjectVO();
+	        currentProject.setProjectTitle("프로젝트 정보를 찾을 수 없습니다.");
 	    }
+	    model.addAttribute("currentProject", currentProject);
 		
+		// 일감 목록 조회
+		List<TaskVO> taskList = taskService.findAll(projectId);
+		for(TaskVO t : taskList) {
+		    System.out.println("데이터 확인 -> 제목: " + t.getTaskTitle() + ", 설명: " + t.getTaskDescribe());
+		}
+		model.addAttribute("taskList", taskList);
+		
+		//사용자 목록 조회(String으로 변환)
+		List<UserVO> userList = userService.findUsersByProjectId(String.valueOf(projectId));
+		model.addAttribute("userList", userList);
+		
+		// WorkTimeVO 생성 및 projectId 할당
+	    WorkTimeVO workTimeVO = new WorkTimeVO();
+	    if (projectId != null) {
+	        workTimeVO.setProjectId(projectId);
+	    }
+	    
+	    //작업분류에 있는 null 제외하고 데이터 불러옴
+	    List<CodeValueVO> workTypeList = codeValueService.findCodeValueAll();
+	    workTypeList = workTypeList.stream()
+	    		.filter(vo -> vo.getWorkName() != null && !vo.getWorkName().isEmpty())
+	    		.collect(Collectors.toList());
+	    
+	    //사이드바
+	    List<String> moduleNames = projectService.findModuleNames(projectId);
+	    model.addAttribute("moduleNames", moduleNames);
+	    
+	    model.addAttribute("workTimeVO", workTimeVO);
 		model.addAttribute("currentMenu", "time");
 		model.addAttribute("sidebarMenu", "project");
 		model.addAttribute("projectId", projectId);
-		
-		List<String> moduleNames = projectService.findModuleNames(projectId);
-	    model.addAttribute("moduleNames", moduleNames);
-		    
-		List<TaskVO> taskList = new ArrayList<>();
-	    if (projectId != null) {
-	        taskList = taskService.findAll(projectId);
-	    }
-	    
-	  //작업분류에 있는 null 제외하고 데이터 불러옴
-	    List<CodeValueVO> workTypeList = codeValueService.findCodeValueAll();
-	    workTypeList = workTypeList.stream()
-	    	    .filter(vo -> vo.getWorkName() != null && !vo.getWorkName().isEmpty())
-	    	    .collect(Collectors.toList());
-	    
 	    model.addAttribute("projectList", projectList);
 	    model.addAttribute("taskList", taskList);
 	    model.addAttribute("workTypeList", workTypeList);
-	    model.addAttribute("workTimeVO", new WorkTimeVO()); // 입력할 객체 초기화
 		return "weple/time/insert";
 	}
 

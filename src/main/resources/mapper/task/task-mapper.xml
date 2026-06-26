@@ -13,7 +13,8 @@
 			u.user_name AS taskManager, 
 			t.created_at AS createdAt,
 			t.finish_date AS finishDate,
-			t.project_id AS projectId
+			t.project_id AS projectId,
+			t.estimated_time AS estimatedTime
 		FROM
 			task t
 		INNER JOIN
@@ -357,5 +358,10 @@ END;
 		work_time wt LEFT JOIN users u ON wt.user_code = u.user_code
 	WHERE task_id = #{tId}
 </select>
+
+<!-- 소요시간의 진척도 자동계산 프로시저 - 민지 -->
+<update id="updateHierarchicalProgress" statementType="CALLABLE" parameterType="string">
+    { CALL UPDATE_PROGRESS_HIERARCHY(#{taskId}) }
+</update>
 
 </mapper>

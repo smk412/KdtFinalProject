@@ -59,5 +59,8 @@ public interface TaskMapper {
     public List<TaskSpentTimeVO> taskSpentTime(@Param("tId") String tId);
 
     public Long getMilestoneIdByTaskId(@Param("tId") String tId);
+    
+    // 소요시간의 진척도 자동계산 프로시저 - 민지
+    public void updateHierarchicalProgress(@Param("taskId") String taskId);
 
 }
