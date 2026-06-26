@@ -23,4 +23,7 @@ public interface ProjectService {
 	
 	// 설정 페이지 - 프로젝트 설정 저장
 	public void saveProjectSetting(ProjectVO vo);
+	
+	// URL 접근 제어 - 모듈 활성화 여부
+	public boolean isModuleActive(Long projectId, String moduleName);
 }

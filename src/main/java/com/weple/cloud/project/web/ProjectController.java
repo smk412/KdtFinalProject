@@ -31,18 +31,18 @@ public class ProjectController {
 	static {
         ALL_MODULES = new ArrayList<>();
         for (String[] m : new String[][]{
-        	{"개요", "개요"},
-            {"작업내역", "작업내역"},
-            {"마일스톤", "마일스톤"},
-            {"일감", "일감"},
-            {"소요시간", "소요시간"},
-            {"간트차트", "간트차트"},
-            {"테스트", "테스트"},
-            {"위키", "위키"},
-            {"파일관리", "파일관리"},
-            {"저장소", "저장소"},
-            {"칸반보드", "칸반보드"},
-            {"캘린더", "캘린더"}
+        	{"개요", "개요", "/project/overview"},
+            {"작업내역", "작업내역", "/project/worklog"},
+            {"마일스톤", "마일스톤", "/project/milestone"},
+            {"일감", "일감", "/project/task"},
+            {"소요시간", "소요시간", "/projectTimeList"},
+            {"간트차트", "간트차트", "/project/gantt"},
+            {"테스트", "테스트", "/project/test"},
+            {"위키", "위키", "/project/wiki"},
+            {"파일관리", "파일관리", "/project/file"},
+            {"저장소", "저장소", "/repository/list"},
+            {"칸반보드", "칸반보드", "/project/kanban"},
+            {"캘린더", "캘린더", "/project/calendar"}
         }) {
             Map<String, String> map = new HashMap<>();
             map.put("name",  m[0]); // DB 저장값

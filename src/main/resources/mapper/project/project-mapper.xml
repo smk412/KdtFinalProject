@@ -162,4 +162,11 @@
 				)
 	</insert>
 	
+	<!-- URL 접근 제어 -->
+	<select id="isModuleActive" resultType="int">
+		SELECT COUNT(*)
+		FROM module_mapping
+		WHERE project_id = #{projectId}
+		  AND module_name = #{moduleName}
+	</select>
 </mapper>

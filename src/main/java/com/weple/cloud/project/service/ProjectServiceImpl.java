@@ -73,4 +73,10 @@ public class ProjectServiceImpl implements ProjectService {
 			}
 		}
 	}
+	
+	// URL 접근 제어 - module_mapping row 존재 여부로 활성화 판단
+    @Override
+    public boolean isModuleActive(Long projectId, String moduleName) {
+        return projectMapper.isModuleActive(projectId, moduleName) > 0;
+    }
 }

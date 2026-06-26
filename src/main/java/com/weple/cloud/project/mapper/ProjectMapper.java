@@ -41,4 +41,8 @@ public interface ProjectMapper {
 	public int insertModuleMapping(
             @Param("projectId")  Long projectId,
             @Param("moduleCode") String moduleCode);
+	
+	// URL 접근 제어 - 모듈 활성화 여부
+	public int isModuleActive(@Param("projectId") Long projectId,
+							  @Param("moduleName") String moduleName);
 }
