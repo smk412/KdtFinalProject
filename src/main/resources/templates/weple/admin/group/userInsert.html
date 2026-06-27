@@ -112,18 +112,21 @@
 		    }
 
 		    // 2. 검색
-		    const searchInput = document.getElementById('userSearchInput');
-		    if (searchInput) {
-		        searchInput.addEventListener('input', function () {
-		            const keyword = this.value.trim().toLowerCase();
-		            const targetUsers = document.querySelectorAll('.list-section .group-box-card:last-child .user-item');
-
-		            targetUsers.forEach(item => {
-		                const name = item.querySelector('.user-name').textContent.toLowerCase();
-		                item.style.display = name.includes(keyword) ? 'flex' : 'none';
-		            });
-		        });
-		    }
+		   const searchInput = document.getElementById('userSearchInput');
+			if (searchInput) {
+			    searchInput.addEventListener('input', function () {
+			        const keyword = this.value.trim().toLowerCase();
+			        
+			        // 수정된 부분: #availableGroup 내부의 .user-item만 선택합니다.
+			        const targetUsers = document.querySelectorAll('#availableGroup .user-item');
+			
+			        targetUsers.forEach(item => {
+			            const name = item.querySelector('.user-name').textContent.toLowerCase();
+			            // 검색어에 포함되면 보여주고, 아니면 숨깁니다.
+			            item.style.display = name.includes(keyword) ? 'flex' : 'none';
+			        });
+			    });
+			}
 
 		    // 3. 이동 기능
 		    const arrows = document.querySelectorAll('.direction-arrows svg');

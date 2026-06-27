@@ -138,6 +138,20 @@
 	            WHERE task_priority_id = #{id}
 	        </otherwise>
 	    </choose>
-</update>-->
+	</update>-->
+	
+	<select id="selectDefaultNameByType" parameterType="string" resultType="string">
+	    SELECT 
+	        <choose>
+	            <when test="type == 'work'">work_name</when>
+	            <otherwise>priority_name</otherwise>
+	        </choose>
+	    FROM 
+	        <choose>
+	            <when test="type == 'work'">task_classification</when>
+	            <otherwise>task_priority</otherwise>
+	        </choose>
+	    WHERE default_yn = 'Y'
+	</select>
 
 </mapper>

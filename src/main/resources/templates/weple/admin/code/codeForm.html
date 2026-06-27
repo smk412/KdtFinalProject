@@ -77,37 +77,37 @@
 
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
-	        const form = document.getElementById('codeForm');
+		    const form = document.getElementById('codeForm');
+		    const defaultItemName = /*[[${defaultItemName}]]*/ '기본값';
 
-	        form.addEventListener('submit', function(e) {
-	            const defaultCheckbox = document.querySelector('input[name="defaultYn"]');
-	            const usingCheckbox = document.querySelector('input[name="usingYn"]');
-	            
-	            const isDefaultChecked = defaultCheckbox ? defaultCheckbox.checked : false;
-	            const isUsingChecked = usingCheckbox ? usingCheckbox.checked : false;
+		    form.addEventListener('submit', function(e) {
+		        const defaultCheckbox = document.querySelector('input[name="defaultYn"]');
+		        const usingCheckbox = document.querySelector('input[name="usingYn"]');
+		        
+		        const isDefaultChecked = defaultCheckbox ? defaultCheckbox.checked : false;
+		        const isUsingChecked = usingCheckbox ? usingCheckbox.checked : false;
 
-	            //사용중이 아닌데 기본값 체크
-	            if (isDefaultChecked && !isUsingChecked) {
-	                e.preventDefault();
-	                alert("사용중이 아닌 항목은 기본값으로 설정할 수 없습니다.");
-	                return false;
-	            }
+		        if (isDefaultChecked && !isUsingChecked) {
+		            e.preventDefault();
+		            alert("사용중이 아닌 항목은 기본값으로 설정할 수 없습니다.");
+		            return false;
+		        }
 
-	            //기본값 체크
-	            if (isDefaultChecked) {
-	                e.preventDefault(); 
-	                
-	                if (confirm("이미 기본값이 설정되어 있습니다. 현재 항목을 기본값으로 변경하시겠습니까?")) {
-	                    form.submit();
-	                } else {
-	                    if (typeof tui !== 'undefined') {
-	                        const toast = new tui.Notification({ position: 'top-right' });
-	                        toast.error("기본값 변경이 취소되었습니다.");
-	                    }
-	                }
-	            }
-	        });
-	    });
+		        if (isDefaultChecked) {
+		            e.preventDefault(); 
+		            const msg = `이미 ${defaultItemName}이(가) 기본값으로 설정되어 있습니다. 현재 항목을 기본값으로 변경하시겠습니까?`;
+		            
+		            if (confirm(msg)) {
+		                form.submit();
+		            } else {
+		                if (typeof tui !== 'undefined') {
+		                    const toast = new tui.Notification({ position: 'top-right' });
+		                    toast.error("기본값 변경이 취소되었습니다.");
+		                }
+		            }
+		        }
+		    });
+		});
 		</script>
 		
 		<style>
