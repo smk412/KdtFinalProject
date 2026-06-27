@@ -9,7 +9,7 @@ import com.weple.cloud.history.worklog.service.WorkLogVO;
 
 @Mapper
 public interface ProjectWorkLogMapper {
-	List<WorkLogVO> selectProjectWorkLog(
+	public List<WorkLogVO> selectProjectWorkLog(
 			@Param("projectId") String projectId,
 			@Param("startDate") String startDate,
             @Param("endDate") String endDate,
@@ -18,10 +18,18 @@ public interface ProjectWorkLogMapper {
             @Param("offset") int offset,
             @Param("pageSize") int pageSize);
 		    
-	int countProjectWorkLog(
+	public int countProjectWorkLog(
 		    @Param("projectId") String projectId,
 		    @Param("startDate") String startDate,
 		    @Param("endDate") String endDate,
 		    @Param("userCode") String userCode,
 		    @Param("typeNames") List<String> typeNames);
+	
+	public Double sumSpentHour(
+		    @Param("projectId")  String projectId,
+		    @Param("startDate")  String startDate,
+		    @Param("endDate")    String endDate,
+		    @Param("userCode")   String userCode,
+		    @Param("typeNames")  List<String> typeNames
+		);
 }

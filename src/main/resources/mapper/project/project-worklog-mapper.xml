@@ -92,5 +92,31 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
         </where>
     </select>
+    
+    <!-- 총 소요시간 합계(해당 기간+필터 조건) -->
+    <select id="sumSpentHour" resultType="java.lang.Double">
+	    SELECT NVL(SUM(w.spent_hour), 0)
+	    FROM work_time w
+	    LEFT JOIN task t ON w.task_id = t.task_id
+	    LEFT JOIN task_types tt ON t.type_id = tt.type_id
+	    <where>
+	        w.project_id = TO_NUMBER(#{projectId})
+	        <if test="userCode != null and userCode != ''">
+	            AND w.user_code = #{userCode}
+	        </if>
+	        <if test="startDate != null and startDate != ''">
+	            AND w.work_date &gt;= TO_DATE(#{startDate}, 'YYYY.MM.DD')
+	        </if>
+	        <if test="endDate != null and endDate != ''">
+	            AND w.work_date &lt;= TO_DATE(#{endDate}, 'YYYY.MM.DD')
+	        </if>
+	        <if test="typeNames != null and typeNames.size() > 0">
+	            AND tt.type_name IN
+	            <foreach collection="typeNames" item="type" open="(" separator="," close=")">
+	                #{type}
+	            </foreach>
+	        </if>
+	    </where>
+	</select>
 
 </mapper>

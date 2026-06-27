@@ -5,7 +5,7 @@ import java.util.List;
 import com.weple.cloud.history.worklog.service.WorkLogVO;
 
 public interface ProjectWorkLogService {
-	List<WorkLogVO> findAll(
+	public List<WorkLogVO> findAll(
 			String projectId,
             String startDate,
             String endDate,
@@ -14,10 +14,17 @@ public interface ProjectWorkLogService {
             int offset,
             int pageSize);
 	
-	 int countAll(
+	public int countAll(
 	            String projectId,
 	            String startDate,
 	            String endDate,
 	            String userCode,
 	            List<String> typeNames);
+	
+	public Double sumSpentHour(
+				  String projectId,
+				  String startDate,
+				  String endDate,
+				  String userCode,
+				  List<String> typeNames);
 }

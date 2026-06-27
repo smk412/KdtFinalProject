@@ -117,3 +117,21 @@
         .flatpickr-day.selected, .flatpickr-day.selected:hover, .flatpickr-day.startRange, .flatpickr-day.startRange:hover, .flatpickr-day.endRange, .flatpickr-day.endRange:hover, .flatpickr-day.today.selected { background: #4d84ff !important; border-color: #4d84ff !important; color: #fff !important; font-weight: 700 !important; border-radius: 8px !important; }
         .flatpickr-day.inRange { background: #eef4ff !important; border-color: #eef4ff !important; box-shadow: -5px 0 0 #eef4ff, 5px 0 0 #eef4ff !important; color: #4d84ff !important; }
         .numInputWrapper:hover { background: transparent; }
+        
+        /* ── 검색 버튼 ── */
+.btn-search {
+    height: 38px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: #4d84ff;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-search:hover {
+    background: #3970eb;
+}

@@ -42,6 +42,7 @@ public class WorkLogController {
             @RequestParam(required = false) String userCode,
             @RequestParam(required = false) List<String> typeNames,
             @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "search", required = false) String search,
 			Model model) {
 		
 		 // 날짜 기본값: 최근 5일
@@ -58,25 +59,38 @@ public class WorkLogController {
 		        for (String t : typeNames) redirectUrl.append("&typeNames=").append(t);
 		    return redirectUrl.toString();
 		}
-
-        int pageSize = 10;
-        int offset = (page - 1) * pageSize;
 		
-        List<WorkLogVO> list = workLogService.findAll(
-                projectId, startDate, endDate, userCode, typeNames, offset, pageSize);
+		List<WorkLogVO> list = null;
+	    int totalPages = 0;
+	    Double totalSpentHour = null;
 
-        int totalCount = workLogService.countAll(
-                projectId, startDate, endDate, userCode, typeNames);
-
-        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+	 // 검색 버튼 클릭 시에만 데이터 조회
+        if ("true".equals(search)) {
+            int pageSize = 10;
+            int offset = (page - 1) * pageSize;
+ 
+            list = workLogService.findAll(
+                    projectId, startDate, endDate, userCode, typeNames, offset, pageSize);
+ 
+            int totalCount = workLogService.countAll(
+                    projectId, startDate, endDate, userCode, typeNames);
+ 
+            totalPages = (int) Math.ceil((double) totalCount / pageSize);
+ 
+            totalSpentHour = workLogService.sumSpentHour(
+                    projectId, startDate, endDate, userCode, typeNames);
+        }
 		
+        // 프로젝트 목록 (필터 셀렉박스용)
 		List<ProjectVO> projectList = projectService.findAll("");
 		model.addAttribute("projects", projectList);
 		
+		// 사용자 목록 (필터 셀렉박스용)
 		List<UserVO> userList = userService.findAllActiveUsers();
 		model.addAttribute("users", userList);
 		
 		model.addAttribute("workLogList", list);
+		model.addAttribute("searched", "true".equals(search));
 		model.addAttribute("projectId", projectId);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
@@ -84,6 +98,7 @@ public class WorkLogController {
 		model.addAttribute("typeNames", typeNames);
 		model.addAttribute("currentPage", page);      
 		model.addAttribute("totalPages", totalPages); 
+		model.addAttribute("totalSpentHour", totalSpentHour);
 		
 		model.addAttribute("sidebarMenu", "work-history");
 		model.addAttribute("currentMenu", "none");

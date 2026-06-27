@@ -132,7 +132,15 @@ public class TaskController {
 	    taskHistoryService.insertHistory(
 	    	    taskVO.getTaskId(), userCode, "CREATE",
 	    	    null, taskVO.getTaskTitle(),   
-	    	    null, taskVO.getTypeIdName()
+	    	    null, taskVO.getTypeIdName(),
+	    	    null, taskVO.getTaskStatus(),
+	    	    null, taskVO.getTaskManager(),
+	    	    null, taskVO.getPriority(),
+	    	    null, toStr(taskVO.getStartDate()),
+	    	    null, toStr(taskVO.getFinishDate()),
+	    	    null, toStr(taskVO.getEstimatedTime()),
+	    	    null, toStr(taskVO.getTaskProgress()),
+	    	    null, taskVO.getParentTaskId()
 	    	);
 	    
 	    return "redirect:/project/task?projectId=" + pId;
@@ -325,8 +333,16 @@ public class TaskController {
 	    // 작업내역 저장-은지
 	    taskHistoryService.insertHistory(
 	    	  taskVO.getTaskId(), userCode, "UPDATE",
-	    	  oldTitle, taskVO.getTaskTitle(),      
-	    	  oldTypeName, taskVO.getTypeIdName()  
+	    	  before.getTaskTitle(),              taskVO.getTaskTitle(),
+	          before.getTypeIdName(),             taskVO.getTypeIdName(),
+	          before.getTaskStatus(),             taskVO.getTaskStatus(),
+	          before.getTaskManager(),            taskVO.getTaskManager(),
+	          before.getPriority(),               taskVO.getPriority(),
+	          toStr(before.getStartDate()),       toStr(taskVO.getStartDate()),
+	          toStr(before.getFinishDate()),      toStr(taskVO.getFinishDate()),
+	          toStr(before.getEstimatedTime()),   toStr(taskVO.getEstimatedTime()),
+	          toStr(before.getTaskProgress()),    toStr(taskVO.getTaskProgress()),
+	          before.getParentTaskId(),           taskVO.getParentTaskId()
 	    	);
 	    
 	    // 수정 완료 후 해당 일감의 상세조회 페이지로 리다이렉트
@@ -356,8 +372,16 @@ public class TaskController {
 	    // 삭제 이력 저장
 	    taskHistoryService.insertHistory(
 	        tId, userCode, "DELETE",
-	        oldTitle, null,   
-	        oldTypeName, null  
+	        before.getTaskTitle(),              null,
+            before.getTypeIdName(),             null,
+            before.getTaskStatus(),             null,
+            before.getTaskManager(),            null,
+            before.getPriority(),               null,
+            toStr(before.getStartDate()),       null,
+            toStr(before.getFinishDate()),      null,
+            toStr(before.getEstimatedTime()),   null,
+            toStr(before.getTaskProgress()),    null,
+            before.getParentTaskId(),           null
 	    );
 	    
 	    // 해당 프로젝트의 일감 목록 페이지로 리다이렉트
@@ -383,6 +407,11 @@ public class TaskController {
 	    return "weple/task/detail :: #commentArea";
 	}
 	
+	
+	 // null 안전 toString 헬퍼 - 은지
+    private String toStr(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
 
 
 
