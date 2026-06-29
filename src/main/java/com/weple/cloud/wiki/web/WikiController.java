@@ -6,20 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.weple.cloud.auth.service.LoginUserDetails;
 import com.weple.cloud.project.service.ProjectService;
-import com.weple.cloud.wiki.service.WikiHistoryVO;
-import com.weple.cloud.wiki.service.WikiPageVO;
-import com.weple.cloud.wiki.service.WikiRelationVO;
-import com.weple.cloud.wiki.service.WikiService;
+import com.weple.cloud.wiki.service.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +21,9 @@ public class WikiController {
     private final WikiService    wikiService;
     private final ProjectService projectService;
 
+    // ════════════════════════════════════════════════════════
     //  공통 model 세팅
+    // ════════════════════════════════════════════════════════
     private void setCommonModel(Model model, Long projectId) {
         model.addAttribute("project",     projectService.findById(String.valueOf(projectId)));
         model.addAttribute("moduleNames", projectService.findActiveModuleNames(projectId));
@@ -39,7 +32,9 @@ public class WikiController {
         model.addAttribute("projectId",   projectId);
     }
 
-    //  위키 조회 페이지
+    // ════════════════════════════════════════════════════════
+    //  위키 조회 페이지  GET /project/wiki
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki")
     public String wikiPage(
             @RequestParam Long projectId,
@@ -51,7 +46,7 @@ public class WikiController {
 
         WikiPageVO          selectedWiki = null;
         List<WikiHistoryVO> historyList  = null;
-        List<WikiRelationVO> relationList = null;
+        List<WikiRelationVO> relationList = new java.util.ArrayList<>();
 
         // 선택된 위키 결정
         if (wikiPageId != null && !wikiPageId.isBlank()) {
@@ -84,7 +79,9 @@ public class WikiController {
         return "weple/wiki/detail";
     }
 
-    //  특정 버전 조회
+    // ════════════════════════════════════════════════════════
+    //  특정 버전 조회  GET /project/wiki/version
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki/version")
     public String wikiVersionPage(
             @RequestParam Long    projectId,
@@ -125,7 +122,9 @@ public class WikiController {
         return "weple/wiki/detail";
     }
 
-    //  위키 등록 페이지
+    // ════════════════════════════════════════════════════════
+    //  위키 등록 페이지  GET /project/wiki/register
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki/register")
     public String wikiRegisterForm(
             @RequestParam Long   projectId,
@@ -139,8 +138,10 @@ public class WikiController {
         return "weple/wiki/register";
     }
 
-    //  위키 등록 처리
-    //  relations JSON 파싱 후 wiki_relations 저장
+    // ════════════════════════════════════════════════════════
+    //  위키 등록 처리  POST /project/wiki/register
+    //  ★ relations JSON 파싱 후 wiki_relations 저장
+    // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/register")
     public String wikiRegisterProcess(
             @RequestParam Long   projectId,
@@ -155,8 +156,10 @@ public class WikiController {
         return "redirect:/project/wiki?projectId=" + projectId;
     }
 
-    //  위키 수정 페이지 
-    //  편집 잠금 획득
+    // ════════════════════════════════════════════════════════
+    //  위키 수정 페이지  GET /project/wiki/modify/{wikiPageId}
+    //  ★ 편집 잠금 획득
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki/modify/{wikiPageId}")
     public String wikiModifyForm(
             @PathVariable String wikiPageId,
@@ -198,8 +201,10 @@ public class WikiController {
         return "weple/wiki/modify";
     }
 
-    //  위키 수정 처리 
-    //  저장 완료 시 잠금 해제 (서비스에서 처리)
+    // ════════════════════════════════════════════════════════
+    //  위키 수정 처리  POST /project/wiki/modify
+    //  ★ 저장 완료 시 잠금 해제 (서비스에서 처리)
+    // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/modify")
     public String wikiModifyProcess(
             @RequestParam Long projectId,
@@ -213,7 +218,9 @@ public class WikiController {
         return "redirect:/project/wiki?projectId=" + projectId + "&wikiPageId=" + vo.getWikiPageId();
     }
 
-    //  취소 시 잠금 해제
+    // ════════════════════════════════════════════════════════
+    //  취소 시 잠금 해제  POST /project/wiki/unlock
+    // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/unlock")
     @ResponseBody
     public ResponseEntity<Void> unlockWiki(
@@ -224,7 +231,9 @@ public class WikiController {
         return ResponseEntity.ok().build();
     }
 
-    //  위키 삭제  POST
+    // ════════════════════════════════════════════════════════
+    //  위키 삭제  POST /project/wiki/delete/{wikiPageId}
+    // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/delete/{wikiPageId}")
     public String wikiDelete(
             @PathVariable String wikiPageId,
@@ -237,7 +246,9 @@ public class WikiController {
         return "redirect:/project/wiki?projectId=" + projectId;
     }
 
-    //  특정 버전 조회 (AJAX)
+    // ════════════════════════════════════════════════════════
+    //  특정 버전 조회 (AJAX)  GET /project/wiki/history
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki/history")
     @ResponseBody
     public ResponseEntity<WikiHistoryVO> getHistoryVersion(
@@ -248,7 +259,9 @@ public class WikiController {
         return history == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(history);
     }
 
-    //  해시태그 자동완성
+    // ════════════════════════════════════════════════════════
+    //  해시태그 자동완성  GET /project/wiki/hashtag/search
+    // ════════════════════════════════════════════════════════
     @GetMapping("/project/wiki/hashtag/search")
     @ResponseBody
     public ResponseEntity<List<WikiRelationVO>> hashtagSearch(
@@ -260,19 +273,48 @@ public class WikiController {
         return ResponseEntity.ok(result);
     }
 
-    //  연관문서 추가
+    // ════════════════════════════════════════════════════════
+    //  연관문서 추가  POST /project/wiki/relation/add
+    //  @RequestBody + CSRF 이슈 방지: 파라미터 방식으로 수신
+    // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/relation/add")
     @ResponseBody
-    public ResponseEntity<Void> addRelation(@RequestBody WikiRelationVO vo) {
-        wikiService.addRelation(vo);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> addRelation(
+            @RequestParam String wikiPageId,
+            @RequestParam String targetType,
+            @RequestParam Long   projectId,
+            @RequestParam(required = false) String targetTaskId,
+            @RequestParam(required = false) String targetWikiId) {
+        try {
+            WikiRelationVO vo = new WikiRelationVO();
+            vo.setWikiPageId(wikiPageId);
+            vo.setTargetType(targetType);
+            vo.setProjectId(projectId);
+            // null 또는 빈 문자열 처리
+            vo.setTargetTaskId(targetTaskId != null && !targetTaskId.isBlank() ? targetTaskId : null);
+            vo.setTargetWikiId(targetWikiId != null && !targetWikiId.isBlank() ? targetWikiId : null);
+
+            int result = wikiService.addRelation(vo);
+            return ResponseEntity.ok("ok:" + vo.getWikiRelationId() + ":rows=" + result);
+        } catch (Exception e) {
+            // 전체 스택 트레이스를 응답에 포함 (디버깅용)
+            StringBuilder sb = new StringBuilder(e.getMessage() != null ? e.getMessage() : "null");
+            Throwable cause = e.getCause();
+            while (cause != null) {
+                sb.append(" | caused by: ").append(cause.getMessage());
+                cause = cause.getCause();
+            }
+            return ResponseEntity.status(500).body(sb.toString());
+        }
     }
 
-    //  연관문서 삭제
+    // ════════════════════════════════════════════════════════
+    //  연관문서 삭제  DELETE /project/wiki/relation/{id}
+    // ════════════════════════════════════════════════════════
     @DeleteMapping("/project/wiki/relation/{wikiRelationId}")
     @ResponseBody
-    public ResponseEntity<Void> removeRelation(@PathVariable String wikiRelationId) {
-        wikiService.removeRelation(wikiRelationId);
+    public ResponseEntity<Void> removeRelation(@PathVariable Long wikiRelationId) {
+        wikiService.removeRelation(String.valueOf(wikiRelationId));
         return ResponseEntity.ok().build();
     }
 }
