@@ -38,7 +38,6 @@
             </div>
 
             <div class="wiki-tree-wrap">
-                <!-- 검색 결과 -->
                 <div th:if="${searchResult != null}">
                     <div th:if="${#lists.isEmpty(searchResult)}" class="wiki-empty">결과 없음</div>
                     <ul class="wiki-tree">
@@ -49,7 +48,6 @@
                         </li>
                     </ul>
                 </div>
-                <!-- 트리 목록 -->
                 <div th:if="${searchResult == null}">
                     <div th:if="${#lists.isEmpty(wikiTree)}" class="wiki-empty">등록된 위키가 없습니다.</div>
                     <ul class="wiki-tree" th:unless="${#lists.isEmpty(wikiTree)}">
@@ -67,22 +65,23 @@
 
             <th:block th:if="${selectedWiki != null}">
 
-                <!-- 삭제 폼 -->
                 <form th:action="@{/project/wiki/delete/{id}(id=${selectedWiki.wikiPageId})}"
                       method="post" id="deleteForm" style="display:none">
                     <input type="hidden" name="projectId" th:value="${projectId}">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 </form>
 
-                <!-- 문서 헤더 -->
                 <div class="wiki-doc-header">
                     <div class="wiki-doc-left">
                         <h2 class="wiki-doc-title" th:text="${selectedWiki.title}"></h2>
                         <div class="wiki-doc-meta">
                             <div class="wiki-author-wrap">
-                                <img src="/images/user-default.png"
+                                <!-- 프로필 이미지: 기본 hamster.jpg, JS로 실제 프로필 교체 -->
+                                <img id="wikiAuthorImg"
+                                     src="/images/hamster.jpg"
                                      class="wiki-author-img" alt=""
-                                     onerror="this.style.display='none'">
+                                     th:attr="data-user-code=${selectedWiki.userCode}"
+                                     onerror="this.src='/images/hamster.jpg'">
                                 <span class="wiki-author-name"
                                       th:text="${selectedWiki.userName != null ? selectedWiki.userName : ''}"></span>
                                 <span class="wiki-author-email"
@@ -114,10 +113,8 @@
                     등록된 내용이 없습니다. 수정 버튼을 눌러 내용을 작성해주세요.
                 </div>
 
-                <!-- Toast UI Viewer -->
                 <div id="wikiViewer" class="wiki-viewer-wrap"></div>
 
-                <!-- ★ 연관 문서 섹션 (조회) -->
                 <th:block th:if="${relationList != null and !#lists.isEmpty(relationList)}">
                     <div class="wiki-relation-section">
                         <div class="wiki-relation-section-title">🔗 연관 문서</div>
@@ -139,7 +136,6 @@
         <!-- ③ 우측: 문서정보 + 변경이력 -->
         <div class="wiki-right-col" th:if="${selectedWiki != null}">
 
-            <!-- 문서 정보 -->
             <div class="wiki-info-box">
                 <div class="wiki-box-title">문서 정보</div>
                 <div class="wiki-info-body">
@@ -148,7 +144,6 @@
                         <span class="info-value"
                               th:text="${currentWiki != null ? currentWiki.wikiPageId : selectedWiki.wikiPageId}"></span>
                     </div>
-                    <!-- ★ 태그: wiki_relations 기반 동적 표시 + 하이퍼링크 -->
                     <div class="wiki-info-row">
                         <span class="info-label">태그 (연관 문서)</span>
                         <span class="info-value wiki-tag-list">
@@ -167,13 +162,11 @@
                 </div>
             </div>
 
-            <!-- 변경 이력 -->
             <div class="wiki-history-box">
                 <div class="wiki-box-title">변경 이력</div>
                 <div class="wiki-history-body">
                     <ul class="wiki-history-list" id="historyList">
 
-                        <!-- 최신 버전 -->
                         <li class="wiki-history-item"
                             id="historyItem-latest"
                             th:with="cw=${currentWiki != null ? currentWiki : selectedWiki}">
@@ -190,7 +183,6 @@
                                   th:text="${cw.updateAt != null ? #temporals.format(cw.updateAt,'yyyy-MM-dd HH:mm') : ''}"></span>
                         </li>
 
-                        <!-- 이전 버전들 -->
                         <th:block th:if="${historyList != null}">
                             <li class="wiki-history-item"
                                 th:each="h : ${historyList}"
@@ -229,7 +221,6 @@
         var viewingVersion = /*[[${isVersionView and selectedWiki != null ? selectedWiki.currentVersion : 0}]]*/ 0;
         /*]]>*/
 
-        /* ── 토스트 알림 ── */
         var _toastContainer = null;
         function getToastContainer() {
             if (!_toastContainer) {
@@ -263,7 +254,6 @@
             setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 220);
         }
 
-        /* ── 커스텀 Confirm ── */
         function wikiConfirm(title, msg, onOk, onCancel) {
             var overlay = document.createElement('div');
             overlay.className = 'wiki-confirm-overlay';
@@ -293,7 +283,6 @@
             });
         }
 
-        /* ── 이력 라디오 강조 ── */
         function updateHistoryHighlight(radio) {
             document.querySelectorAll('.wiki-history-item').forEach(function(li) {
                 li.classList.remove('selected-version');
@@ -315,7 +304,6 @@
             });
         }
 
-        /* ── 한글 툴바 ── */
         var KO_TOOLBAR_LABELS = {
             'Heading':'제목','Bold':'굵게','Italic':'기울임','Strike':'취소선',
             'HR':'구분선','Quote':'인용','Bullet List':'글머리 기호',
@@ -335,7 +323,6 @@
             });
         }
 
-        /* ── YouTube 임베드 ── */
         function extractYoutubeId(url) {
             if (!url) return null;
             var patterns = [
@@ -381,7 +368,6 @@
             });
         }
 
-        /* ── 뷰어 초기화 ── */
         function initWikiViewer() {
             var viewerEl = document.getElementById('wikiViewer');
             if (!viewerEl || !wikiContent || !wikiContent.trim()) return;
@@ -392,7 +378,6 @@
             } catch(e) { console.error('Toast UI error:', e); }
         }
 
-        /* ── 버전 이동 ── */
         function goToVersion() {
             var selected = document.querySelector('input[name="historyVersion"]:checked');
             if (!selected) {
@@ -411,26 +396,45 @@
             }
         }
 
-        /* ── DOMContentLoaded ── */
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 initWikiViewer();
                 bindHistoryRadios();
                 initRadio();
                 applyKoreanToolbar();
+                loadAuthorProfile();
             }, 150);
         });
+
+        /* 작성자 프로필 이미지 동적 로드 */
+        function loadAuthorProfile() {
+            var img = document.getElementById('wikiAuthorImg');
+            if (!img) return;
+            var userCode = img.getAttribute('data-user-code');
+            if (!userCode) return;
+            fetch('/project/wiki/user/profile?userCode=' + encodeURIComponent(userCode))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.profileImg && data.profileImg.trim()) {
+                        /* 이미지 미리 로드 후 교체 (깜빡임 방지) */
+                        var preload = new Image();
+                        preload.onload = function() { img.src = data.profileImg; };
+                        preload.onerror = function() { /* hamster.jpg 유지 */ };
+                        preload.src = data.profileImg;
+                    }
+                })
+                .catch(function() { /* hamster.jpg 유지 */ });
+        }
     </script>
 
 </section>
 
-<!-- ★ 위키 트리 프래그먼트: 무한 depth 재귀 지원 -->
+<!-- 위키 트리 프래그먼트: 무한 depth 재귀 -->
 <th:block th:fragment="wikiTreeFragment(nodes)">
     <li th:each="node : ${nodes}">
         <a th:href="@{/project/wiki(projectId=${projectId}, wikiPageId=${node.wikiPageId})}"
            th:text="${node.title}"
            th:classappend="${selectedWiki != null and selectedWiki.wikiPageId == node.wikiPageId} ? 'active' : ''"></a>
-        <!-- 하위 페이지 존재 시 재귀 렌더링 (depth 제한 없음) -->
         <ul th:if="${node.children != null and !#lists.isEmpty(node.children)}"
             class="wiki-tree-children">
             <th:block th:replace="~{weple/wiki/detail :: wikiTreeFragment(${node.children})}"></th:block>
@@ -438,8 +442,7 @@
     </li>
 </th:block>
 
-
-<!-- ★ 상위 페이지 select 옵션용 flat 재귀 fragment -->
+<!-- 상위 페이지 select 옵션용 재귀 fragment -->
 <th:block th:fragment="selectTreeFragment(nodes, depth)">
     <option th:each="node : ${nodes}"
             th:value="${node.wikiPageId}"

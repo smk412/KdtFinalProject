@@ -100,7 +100,13 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .wiki-tree > li > a::before {
-    content: '📄'; font-size: 11px; margin-right: 6px; flex-shrink: 0; opacity: .55;
+    content: '■';
+    font-size: 8px;
+    margin-right: 7px;
+    flex-shrink: 0;
+    color: #6D5EF7;
+    opacity: .7;
+    line-height: 1;
 }
 .wiki-tree > li > a:hover { background: #EFEAFF; color: #5B4FEA; }
 .wiki-tree > li > a.active {
@@ -118,8 +124,12 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .wiki-tree ul a::before {
-    content: '└'; font-size: 11px; color: #CBD5E1;
-    margin-right: 6px; flex-shrink: 0; font-family: monospace;
+    content: '└';
+    font-size: 11px;
+    color: #CBD5E1;
+    margin-right: 6px;
+    flex-shrink: 0;
+    font-family: monospace;
 }
 .wiki-tree ul a:hover { background: #EFEAFF; color: #5B4FEA; }
 .wiki-tree ul a.active {
@@ -313,7 +323,7 @@
    커스텀 Confirm
 ══════════════════════════════════════ */
 .wiki-confirm-overlay {
-    position: fixed; inset: 0; background: rgba(109,94,247,.2);
+    position: fixed; inset: 0; background: rgba(0,0,0,.15);
     z-index: 99998; display: flex; align-items: center; justify-content: center;
     animation: wikiConfirmFadeIn .18s ease;
 }
@@ -436,6 +446,7 @@
     border: 1px solid #DDD6FE;
     box-shadow: 0 2px 8px rgba(109,94,247,.06);
     display: flex; flex-direction: column; overflow: visible;
+    min-height: calc(100vh - 200px);
 }
 .wiki-register-editor-card .toastui-editor-defaultUI { border: none !important; border-radius: 0 !important; }
 .wiki-register-editor-card .toastui-editor-toolbar   { border-left: none !important; border-right: none !important; border-top: none !important; }

@@ -150,6 +150,11 @@ public class WikiServiceImpl implements WikiService {
      * type = "TASK" | "WIKI" | "" (전체)
      */
     @Override
+    public String getUserProfileImg(String userCode) {
+        return wikiMapper.selectUserProfileImg(userCode);
+    }
+
+    @Override
     public List<WikiRelationVO> searchByHashtag(Long projectId, String keyword, String type) {
         if (keyword == null || keyword.isBlank()) return Collections.emptyList();
 

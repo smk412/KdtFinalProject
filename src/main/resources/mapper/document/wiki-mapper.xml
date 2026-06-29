@@ -19,8 +19,8 @@
         <result column="created_at"      property="createdAt"/>
         <result column="update_at"       property="updateAt"/>
         <result column="user_name"       property="userName"/>
-        <result column="user_email"      property="userEmail"/>
-        <result column="lock_user_name"  property="lockUserName"/>
+        <result column="user_email"       property="userEmail"/>
+        <result column="lock_user_name"   property="lockUserName"/>
     </resultMap>
 
     <resultMap id="wikiHistoryResultMap" type="com.weple.cloud.wiki.service.WikiHistoryVO">
@@ -166,6 +166,13 @@
         FROM wiki_histories
         WHERE wiki_page_id = #{wikiPageId}
           AND wiki_version  = #{wikiVersion}
+    </select>
+
+    <!-- 유저 프로필 이미지 조회 -->
+    <select id="selectUserProfileImg" resultType="String">
+        SELECT profile_image
+        FROM users
+        WHERE user_code = #{userCode}
     </select>
 
     <!-- ═══════════════════════════════════════════════

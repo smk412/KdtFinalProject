@@ -153,6 +153,12 @@ public class WikiController {
         vo.setUserCode(loginUser.getLoginUser().getUserCode());
         wikiService.insertWikiWithRelations(vo, relations);
 
+        // 등록한 글 상세조회로 이동
+        String newPageId = vo.getWikiPageId();
+        if (newPageId != null && !newPageId.isBlank()) {
+            return "redirect:/project/wiki?projectId=" + projectId
+                   + "&wikiPageId=" + newPageId;
+        }
         return "redirect:/project/wiki?projectId=" + projectId;
     }
 
@@ -219,6 +225,25 @@ public class WikiController {
     }
 
     // ════════════════════════════════════════════════════════
+    //  유저 프로필 이미지 조회  GET /project/wiki/user/profile
+    //  빌드 없이 프로필 이미지를 JS로 가져오기 위한 API
+    // ════════════════════════════════════════════════════════
+    @GetMapping("/project/wiki/user/profile")
+    @ResponseBody
+    public ResponseEntity<java.util.Map<String, String>> getUserProfile(
+            @RequestParam String userCode) {
+        try {
+            // users 테이블에서 직접 조회
+            String profileImg = wikiService.getUserProfileImg(userCode);
+            java.util.Map<String, String> result = new java.util.HashMap<>();
+            result.put("profileImg", profileImg != null ? profileImg : "");
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Collections.singletonMap("profileImg", ""));
+        }
+    }
+
+    // ════════════════════════════════════════════════════════
     //  취소 시 잠금 해제  POST /project/wiki/unlock
     // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/unlock")
@@ -233,6 +258,7 @@ public class WikiController {
 
     // ════════════════════════════════════════════════════════
     //  위키 삭제  POST /project/wiki/delete/{wikiPageId}
+    //  삭제 후 상위 페이지 있으면 상위로, 없으면 목록으로 이동
     // ════════════════════════════════════════════════════════
     @PostMapping("/project/wiki/delete/{wikiPageId}")
     public String wikiDelete(
@@ -240,9 +266,19 @@ public class WikiController {
             @RequestParam Long   projectId,
             @AuthenticationPrincipal LoginUserDetails loginUser) {
 
+        // 삭제 전 상위 페이지 ID 저장
+        WikiPageVO wiki = wikiService.findWikiById(wikiPageId);
+        String parentPageId = (wiki != null) ? wiki.getParentPageId() : null;
+
         // 잠금 해제 후 삭제 (관계 포함)
         wikiService.unlockWiki(wikiPageId, loginUser.getLoginUser().getUserCode());
         wikiService.deleteWiki(wikiPageId);
+
+        // 상위 페이지로 이동 or 목록으로
+        if (parentPageId != null && !parentPageId.isBlank()) {
+            return "redirect:/project/wiki?projectId=" + projectId
+                   + "&wikiPageId=" + parentPageId;
+        }
         return "redirect:/project/wiki?projectId=" + projectId;
     }
 

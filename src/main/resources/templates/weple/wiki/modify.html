@@ -10,6 +10,8 @@
 <body>
 <section class="wiki-page">
 
+    <h3 class="wiki-page-title">위키 문서 수정</h3>
+
     <!-- 편집 잠금 배너 -->
     <div class="wiki-modify-lock-banner">
         <span class="wiki-modify-lock-icon">🔒</span>
@@ -62,7 +64,6 @@
                 <div class="wiki-register-relation-area">
                     <div class="wiki-register-relation-label">🔗 연관 문서</div>
                     <div class="wiki-tag-chip-inline-wrap" id="tagInputArea">
-                        <!-- 기존 연관문서 칩 -->
                         <th:block th:if="${relationList != null}">
                             <span th:each="rel : ${relationList}"
                                   th:attr="data-relation-id=${rel.wikiRelationId}"
@@ -73,14 +74,12 @@
                                         th:attr="onclick='removeExistingRelation(\'' + ${rel.wikiRelationId} + '\', this)'">✕</button>
                             </span>
                         </th:block>
-                        <!-- 새로 추가되는 칩 -->
                         <div id="newChipList" style="display:contents;"></div>
                         <input type="text" id="hashtagInput"
                                class="wiki-hashtag-inline-input"
                                placeholder="#일감 또는 #위키 제목"
                                autocomplete="off">
                     </div>
-                    <!-- 드롭다운 -->
                     <div id="hashtagDropdown" class="wiki-hashtag-dropdown" style="display:none;"></div>
                 </div>
             </div>
@@ -96,7 +95,8 @@
                             <li class="wiki-history-item selected-version">
                                 <label class="history-radio-wrap">
                                     <input type="radio" name="modifyHistoryVersion"
-                                           class="history-radio" value="latest" checked>
+                                           class="history-radio" value="latest" checked
+                                           onchange="highlightModifyItem(this);">
                                 </label>
                                 <span class="history-version history-version-latest"
                                       th:text="'v' + ${wiki.currentVersion} + ' (편집중)'"></span>
@@ -105,18 +105,16 @@
                                       th:text="${wiki.updateAt != null ? #temporals.format(wiki.updateAt,'yyyy-MM-dd HH:mm') : ''}"></span>
                             </li>
 
-                            <!-- 이전 버전들 -->
+                            <!-- 이전 버전들: 클릭 이동 없음, 라디오+버튼으로만 이동 -->
                             <th:block th:if="${historyList != null and !#lists.isEmpty(historyList)}">
                                 <li class="wiki-history-item"
                                     th:each="h : ${historyList}"
-                                    th:id="'modifyItem-' + ${h.wikiVersion}"
-                                    style="cursor:pointer;"
-                                    th:attr="onclick='viewVersion(\'' + ${wiki.wikiPageId} + '\',' + ${h.wikiVersion} + ')'">
-                                    <label class="history-radio-wrap" onclick="event.stopPropagation()">
+                                    th:id="'modifyItem-' + ${h.wikiVersion}">
+                                    <label class="history-radio-wrap">
                                         <input type="radio" name="modifyHistoryVersion"
                                                class="history-radio"
                                                th:value="${h.wikiVersion}"
-                                               onclick="event.stopPropagation(); highlightModifyItem(this);">
+                                               onchange="highlightModifyItem(this);">
                                     </label>
                                     <span class="history-version" th:text="'v' + ${h.wikiVersion}"></span>
                                     <span class="history-user" th:text="${h.userName}"></span>
@@ -127,6 +125,7 @@
 
                         </ul>
 
+                        <!-- 이 버전 보기 버튼으로만 이동 -->
                         <div class="history-view-wrap">
                             <button type="button" class="history-view-btn" onclick="goToSelectedVersion()">
                                 이 버전 보기
@@ -155,7 +154,6 @@
         var inp = null;
         var dd  = null;
 
-        /* ── DOMContentLoaded ── */
         document.addEventListener('DOMContentLoaded', function () {
             wikiEditor = new toastui.Editor({
                 el: document.getElementById('wikiEditor'),
@@ -176,7 +174,6 @@
             initHashtag();
         });
 
-        /* ── 저장 ── */
         function submitWikiForm() {
             var title = document.getElementById('titleInput').value.trim();
             if (!title) { alert('문서 제목은 필수 입력 항목입니다.'); return; }
@@ -186,7 +183,6 @@
             document.getElementById('wikiForm').submit();
         }
 
-        /* ── 취소 (잠금 해제) ── */
         function cancelEdit() {
             fetch('/project/wiki/unlock?wikiPageId=' + encodeURIComponent(wikiPageId), {
                 method: 'POST',
@@ -197,7 +193,6 @@
             });
         }
 
-        /* ── 브라우저 닫기 시 잠금 해제 ── */
         window.addEventListener('beforeunload', function () {
             navigator.sendBeacon(
                 '/project/wiki/unlock?wikiPageId=' + encodeURIComponent(wikiPageId)
@@ -205,7 +200,7 @@
             );
         });
 
-        /* ── 이력 강조 ── */
+        /* 이력 라디오 강조 */
         function highlightModifyItem(radio) {
             document.querySelectorAll('.wiki-history-item').forEach(function(li) {
                 li.classList.remove('selected-version');
@@ -216,36 +211,31 @@
             }
         }
 
-        /* ── 이 버전 보기 ── */
+        /* 이 버전 보기 버튼으로만 이동 */
         function goToSelectedVersion() {
             var selected = document.querySelector('input[name="modifyHistoryVersion"]:checked');
-            if (!selected || selected.value === 'latest') return;
-            viewVersion(wikiPageId, selected.value);
-        }
-
-        /* ── 이전 버전 새 탭 ── */
-        function viewVersion(wpId, version) {
+            if (!selected || selected.value === 'latest') {
+                alert('이전 버전을 선택해주세요.');
+                return;
+            }
             window.open(
                 '/project/wiki/version?projectId=' + projectId
-                + '&wikiPageId=' + encodeURIComponent(wpId)
-                + '&version=' + version,
+                + '&wikiPageId=' + encodeURIComponent(wikiPageId)
+                + '&version=' + selected.value,
                 '_blank'
             );
         }
 
-        /* ── 기존 연관문서 삭제 ── */
         function removeExistingRelation(relationId, btn) {
             var headers = {};
             headers[csrfHeader] = csrfToken;
             fetch('/project/wiki/relation/' + encodeURIComponent(relationId), {
-                method: 'DELETE',
-                headers: headers
+                method: 'DELETE', headers: headers
             }).then(function(r) {
                 if (r.ok) btn.closest('span').remove();
             });
         }
 
-        /* ── 해시태그 초기화 ── */
         function initHashtag() {
             inp = document.getElementById('hashtagInput');
             dd  = document.getElementById('hashtagDropdown');
@@ -267,13 +257,11 @@
             if (!e.target.closest('#tagInputArea') && !e.target.closest('#hashtagDropdown')) closeDD();
         });
 
-        /* ── 드롭다운 위치 (뷰포트 하단 초과 시 위쪽으로) ── */
         function positionDD() {
             if (!dd) return;
             var area = document.getElementById('tagInputArea');
             if (!area) return;
             var rect       = area.getBoundingClientRect();
-            var ddHeight   = 200;
             var vpHeight   = window.innerHeight;
             var spaceBelow = vpHeight - rect.bottom - 8;
             var spaceAbove = rect.top - 8;
@@ -281,26 +269,20 @@
             dd.style.position  = 'fixed';
             dd.style.left      = rect.left + 'px';
             dd.style.width     = rect.width + 'px';
-            dd.style.maxHeight = Math.min(ddHeight, Math.max(spaceBelow, spaceAbove)) + 'px';
             dd.style.overflowY = 'auto';
 
             if (spaceBelow >= 120 || spaceBelow >= spaceAbove) {
-                /* 아래에 공간 충분 → 아래로 */
-                dd.style.top    = (rect.bottom + 4) + 'px';
-                dd.style.bottom = 'auto';
+                dd.style.top       = (rect.bottom + 4) + 'px';
+                dd.style.bottom    = 'auto';
                 dd.style.maxHeight = Math.max(spaceBelow - 4, 80) + 'px';
             } else {
-                /* 아래 공간 부족 → 위로 */
-                dd.style.bottom = (vpHeight - rect.top + 4) + 'px';
-                dd.style.top    = 'auto';
+                dd.style.bottom    = (vpHeight - rect.top + 4) + 'px';
+                dd.style.top       = 'auto';
                 dd.style.maxHeight = Math.max(spaceAbove - 4, 80) + 'px';
             }
         }
 
-        /* 스크롤 시 위치 재계산 */
-        window.addEventListener('scroll', function() {
-            if (dd && dd.style.display !== 'none') positionDD();
-        }, true);
+
 
         function fetchHashtag(keyword) {
             fetch('/project/wiki/hashtag/search?projectId=' + projectId
@@ -335,39 +317,23 @@
             dd.innerHTML = '';
         }
 
-        /* ── 항목 선택 → 서버 저장 (URLSearchParams 방식 - CSRF 안전) ── */
         function selectItem(item) {
             var params = new URLSearchParams();
             params.append('wikiPageId', wikiPageId);
             params.append('targetType', item.targetType);
             params.append('projectId',  String(projectId));
-            if (item.targetType === 'TASK' && item.targetTaskId) {
-                params.append('targetTaskId', item.targetTaskId);
-            }
-            if (item.targetType === 'WIKI' && item.targetWikiId) {
-                params.append('targetWikiId', item.targetWikiId);
-            }
+            if (item.targetType === 'TASK' && item.targetTaskId) params.append('targetTaskId', item.targetTaskId);
+            if (item.targetType === 'WIKI' && item.targetWikiId) params.append('targetWikiId', item.targetWikiId);
 
             var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
             headers[csrfHeader] = csrfToken;
 
             fetch('/project/wiki/relation/add', {
-                method: 'POST',
-                headers: headers,
-                body: params.toString()
+                method: 'POST', headers: headers, body: params.toString()
             }).then(function(r) {
-                return r.text().then(function(t) {
-                    console.log('[relation/add] status=' + r.status + ' body=' + t);
-                    if (r.ok) {
-                        addChip(item);
-                    } else {
-                        alert('연관문서 등록 실패 (' + r.status + '): ' + t);
-                    }
-                });
-            }).catch(function(e) {
-                console.error('[relation/add] fetch error:', e);
-                alert('네트워크 오류: ' + e.message);
-            });
+                if (r.ok) { addChip(item); }
+                else { r.text().then(function(t) { alert('연관문서 등록 실패: ' + t); }); }
+            }).catch(function(e) { console.error('relation add error:', e); });
 
             if (inp) inp.value = '';
             closeDD();

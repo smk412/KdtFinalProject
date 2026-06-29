@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      th:replace="~{common/layouts/default_layout :: layout(~{::section}, ~{::head})}">
+<head>
+    <meta charset="UTF-8">
+    <title>설정 - 구성원</title>
+    <link rel="stylesheet" href="/css/project/setting.css">
+    <link rel="stylesheet" href="/css/project/members.css">
+</head>
+<body>
+<section class="settings-page">
+
+<div th:replace="~{common/fragments/project-setting-tabs :: projectSettingTabs}"></div>
+
+    <!-- 구성원 테이블 카드 -->
+    <div class="settings-card">
+        <table class="members-table">
+            <thead>
+                <tr>
+                    <th class="col-no">NO</th>
+                    <th class="col-name">사용자 명</th>
+                    <th class="col-role">역할</th>
+                    <th class="col-action">삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(memberList)}">
+                    <td colspan="4" class="members-empty">등록된 구성원이 없습니다.</td>
+                </tr>
+                <tr th:each="m : ${memberList}" th:attr="data-member-id=${m.memberId}">
+                    <td class="col-no" th:text="${m.rowNum}">1</td>
+                    <td class="col-name">
+                        <div class="member-name-wrap">
+                            <img th:src="${m.profileImage != null and !#strings.isEmpty(m.profileImage)
+                                          ? m.profileImage : '/images/hamster.jpg'}"
+                                 class="member-avatar" alt=""
+                                 onerror="this.src='/images/hamster.jpg'">
+                            <span th:text="${m.userName}">홍길동</span>
+                        </div>
+                    </td>
+                    <td class="col-role" th:text="${m.roleName != null ? m.roleName : '-'}">팀장</td>
+                    <td class="col-action">
+                        <button type="button" class="member-delete-btn"
+                                th:attr="data-member-id=${m.memberId}, data-project-id=${projectId}"
+                                onclick="confirmDeleteMember(this)">
+                            🗑
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 구성원 추가 버튼 -->
+        <div class="members-add-wrap">
+            <button type="button" class="members-add-btn" onclick="openAddModal()">
+                구성원 추가
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         구성원 추가 모달
+    ══════════════════════════════════════ -->
+    <div id="addMemberModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">구성원 추가</span>
+                <button type="button" class="modal-close-btn" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- ① 사용자 검색 -->
+                <div class="modal-section-label">그룹 및 사용자 찾기</div>
+                <div class="modal-search-box">
+                    <span class="modal-search-icon">🔍</span>
+                    <input type="text" id="userSearchInput"
+                           class="modal-search-input"
+                           placeholder="사용자 검색"
+                           oninput="searchUsers(this.value)">
+                </div>
+
+                <!-- ② 검색 결과 (체크박스) -->
+                <div class="modal-user-list" id="userListWrap">
+                    <!-- JS로 렌더링 -->
+                </div>
+
+                <!-- ③ 역할 선택 -->
+                <div class="modal-section-label" style="margin-top:16px;">역할</div>
+                <div class="modal-role-list">
+                    <label th:each="role : ${roleList}" class="modal-role-item">
+                        <input type="radio" name="selectedRole"
+                               th:value="${role.roleId}"
+                               th:attr="data-role-name=${role.roleName}">
+                        <span th:text="${role.roleName}">팀장</span>
+                    </label>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-cancel" onclick="closeAddModal()">취소</button>
+                <button type="button" class="modal-btn modal-btn-submit" onclick="submitAddMember()">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteConfirmModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box modal-box-sm">
+            <div class="modal-header">
+                <span class="modal-title">구성원 삭제</span>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:24px 0;">
+                <p class="modal-confirm-msg">정말 이 구성원을 삭제하시겠습니까?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-cancel"
+                        onclick="closeDeleteModal()">취소</button>
+                <button type="button" class="modal-btn modal-btn-danger"
+                        onclick="executeDelete()">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var projectId  = /*[[${projectId}]]*/ 0;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+        var csrfToken  = /*[[${_csrf.token}]]*/ '';
+        /*]]>*/
+
+        var pendingDeleteMemberId  = null;
+        var pendingDeleteProjectId = null;
+        var searchDebounce = null;
+
+        /* ── 모달 열기/닫기 ── */
+        function openAddModal() {
+            document.getElementById('addMemberModal').style.display = 'flex';
+            document.getElementById('userSearchInput').value = '';
+            document.querySelectorAll('input[name="selectedRole"]').forEach(function(r){ r.checked = false; });
+            searchUsers('');
+        }
+        function closeAddModal() {
+            document.getElementById('addMemberModal').style.display = 'none';
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+            pendingDeleteMemberId = null;
+        }
+
+        /* ── 사용자 검색 ── */
+        function searchUsers(keyword) {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(function() {
+                fetch('/project/settings/members/search?projectId=' + projectId
+                        + '&keyword=' + encodeURIComponent(keyword))
+                    .then(function(r){ return r.json(); })
+                    .then(function(list){ renderUserList(list); })
+                    .catch(function(){ renderUserList([]); });
+            }, 250);
+        }
+
+        function renderUserList(list) {
+            var wrap = document.getElementById('userListWrap');
+            if (!list || !list.length) {
+                wrap.innerHTML = '<p class="modal-empty">검색 결과가 없습니다.</p>';
+                return;
+            }
+            var html = '';
+            list.forEach(function(u) {
+                html += '<label class="modal-user-item">'
+                    + '<input type="checkbox" name="selectedUser" value="' + u.userCode + '">'
+                    + '<img src="' + (u.profileImage || '/images/hamster.jpg') + '"'
+                    + '     class="member-avatar" onerror="this.src=\'/images/hamster.jpg\'">'
+                    + '<span class="modal-user-name">' + u.userName + '</span>'
+                    + '</label>';
+            });
+            wrap.innerHTML = html;
+        }
+
+        /* ── 구성원 추가 등록 ── */
+        function submitAddMember() {
+            var checked = document.querySelectorAll('input[name="selectedUser"]:checked');
+            if (!checked.length) { alert('추가할 사용자를 선택해주세요.'); return; }
+
+            var roleInput = document.querySelector('input[name="selectedRole"]:checked');
+            if (!roleInput) { alert('역할을 선택해주세요.'); return; }
+
+            var roleId   = roleInput.value;
+            var promises = [];
+            var headers  = { 'Content-Type': 'application/x-www-form-urlencoded' };
+            headers[csrfHeader] = csrfToken;
+
+            checked.forEach(function(cb) {
+                var params = new URLSearchParams();
+                params.append('projectId', projectId);
+                params.append('userCode',  cb.value);
+                params.append('roleId',    roleId);
+                promises.push(
+                    fetch('/project/settings/members/add', {
+                        method: 'POST', headers: headers, body: params.toString()
+                    })
+                );
+            });
+
+            Promise.all(promises).then(function() {
+                closeAddModal();
+                location.reload();
+            }).catch(function(e) {
+                alert('구성원 추가 중 오류가 발생했습니다.');
+                console.error(e);
+            });
+        }
+
+        /* ── 구성원 삭제 ── */
+        function confirmDeleteMember(btn) {
+            pendingDeleteMemberId  = btn.getAttribute('data-member-id');
+            pendingDeleteProjectId = btn.getAttribute('data-project-id');
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+        }
+
+        function executeDelete() {
+            if (!pendingDeleteMemberId) return;
+            var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+            headers[csrfHeader] = csrfToken;
+            var params = new URLSearchParams();
+            params.append('memberId',  pendingDeleteMemberId);
+            params.append('projectId', pendingDeleteProjectId || projectId);
+
+            fetch('/project/settings/members/delete', {
+                method: 'POST', headers: headers, body: params.toString()
+            }).then(function(r) {
+                if (r.ok) { closeDeleteModal(); location.reload(); }
+                else { alert('삭제에 실패했습니다.'); }
+            }).catch(function(){ alert('삭제 중 오류가 발생했습니다.'); });
+        }
+
+        /* ── 모달 외부 클릭 닫기 ── */
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'addMemberModal')    closeAddModal();
+            if (e.target.id === 'deleteConfirmModal') closeDeleteModal();
+        });
+
+        /* ── 초기 사용자 목록 로드 ── */
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 로드 시 검색 준비
+        });
+        /*]]>*/
+    </script>
+
+</section>
+</body>
+</html>
