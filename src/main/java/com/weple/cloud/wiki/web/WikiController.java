@@ -27,7 +27,7 @@ public class WikiController {
 	private final WikiService wikiService;
     private final ProjectService projectService;
     
-    // 위키 조회 페이지(목록+선택된 문서)
+    // 위키 조회 페이지(목록+선택된 문서)dd
     @GetMapping("/project/wiki")
     public String wikiPage(
             @RequestParam Long projectId,
