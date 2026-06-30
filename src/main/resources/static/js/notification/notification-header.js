@@ -2,7 +2,7 @@
     'use strict';
 
     var POLL_INTERVAL_MS = 15000;
-    var TOAST_AUTO_CLOSE_MS = 6000;
+    var TOAST_AUTO_CLOSE_MS = 10000;
 
     var bellBtn = document.getElementById('notifBellBtn');
     var dropdown = document.getElementById('notifDropdown');
