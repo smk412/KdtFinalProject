@@ -598,3 +598,29 @@
         min-width: 70px;
     }
     .modal-btn-delete:hover { background:#DC2626; border-color: #c53030; }
+    
+    /* --- 일감 삭제 모달: 삭제 확인 버튼 상태별 스타일 --- */
+
+/* 1. 비활성화 상태 (이름 일치하기 전 - 회색) */
+.repository-button-danger:disabled {
+    background: #cbd5e1 !important;
+    color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    cursor: not-allowed !important;
+    transition: all 0.2s ease;
+}
+
+/* 2. 활성화 상태 (이름 정확히 입력 후 - 빨간색) */
+.repository-button-danger:not(:disabled) {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border: 1px solid #ef4444 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+}
+
+/* 3. 활성화 상태에서 마우스 올렸을 때 (살짝 더 어두운 빨간색) */
+.repository-button-danger:not(:disabled):hover {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+}

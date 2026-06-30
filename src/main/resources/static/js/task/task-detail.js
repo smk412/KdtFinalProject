@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			taskDeleteDialog.close();
 			});
 		});
-    // (아래쪽에 dialog 닫기 버튼 이벤트 처리 코드 등이 이어서 존재할 것입니다)
+    
 });
 
 

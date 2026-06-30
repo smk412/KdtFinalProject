@@ -112,7 +112,7 @@
 								<span style="color: rgb(127, 127, 127); font-weight: bold;">버전아이디:</span>
 								<a th:href="@{/project/download/{id}(id=${file.versionId})}"
 									class="file-link"
-									th:text="|${file.logicalName} - V ${file.versionNumber}|"></a>
+									th:text="|${file.logicalName} - Version${file.versionNumber}|"></a>
 								<span class="file-size" th:text="${file.fileSize} + ' bytes'"></span>
 							</div>
 							<span class="file-date"
@@ -283,7 +283,7 @@
 				<div class="comment-item reply-comment" th:style="${reply.userCode == null} ? 'opacity: 0.6; flex: 1;' : 'flex: 1;'">
 					<div class="comment-header">
 						<div class="user-info">
-							<div class="profile-img"></div>
+							<img class="profile-img" th:src="${comment.profileImage}" alt="프로필 사진" />
 							<strong th:if="${reply.userCode != null}" th:text="|${reply.userName}(${reply.email})|"></strong> 
 							<strong th:if="${reply.userCode == null}" style="color: #94a3b8; font-weight: normal;"></strong> 
 							<span class="comment-date" th:text="${#temporals.format(reply.createdAt, 'yyyy.MM.dd HH:mm')}"></span>
