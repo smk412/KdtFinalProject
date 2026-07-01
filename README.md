@@ -1,4 +1,4 @@
-# KDT_Final_Project
+# WEPLE : 함께 만드는 연결된 협업 플랫폼
 ## 팀 구성 및 역할
 
 <table align="center">
