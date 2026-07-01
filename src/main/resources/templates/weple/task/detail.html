@@ -109,7 +109,7 @@
 					<div class="section-content">
 						<div class="file-item" th:each="file : *{fileList}">
 							<div class="file-info">
-								<span style="color: rgb(127, 127, 127); font-weight: bold;">버전아이디:</span>
+								<span style="color: rgb(127, 127, 127); font-weight: bold;">첨부파일:</span>
 								<a th:href="@{/project/download/{id}(id=${file.versionId})}"
 									class="file-link"
 									th:text="|${file.logicalName} - Version${file.versionNumber}|"></a>
