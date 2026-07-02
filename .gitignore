@@ -169,3 +169,4 @@ uploads/
 # application-secret
 application-api.properties
 src/main/resources/application-api.properties
+src/main/resources/application-local.properties
