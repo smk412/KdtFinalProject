@@ -46,7 +46,7 @@
 		LEFT JOIN work_classification w_cls ON w_tme.work_name = w_cls.task_classification_id
 		LEFT JOIN task t ON t.task_id = w_tme.task_id
 		WHERE w_tme.project_id = #{projectId}
-		ORDER BY w_tme.work_id
+		ORDER BY w_tme.work_id DESC
 	</select>
 	
 	<!-- 단건 조회 (수정 폼용) -->
@@ -101,7 +101,14 @@
 		        , SYSDATE
 		        , SYSDATE
 		)
-	</insert>	
+	</insert>
+	<!-- 소요시간 합 일감 컬럼 추가(진)  -->
+	<update id="updateTaskSpentHoursSum" parameterType="WorkTimeVO">
+    	UPDATE task
+    	SET spent_hours_sum = NVL(spent_hours_sum, 0) + #{spentHour},
+        	updated_at = SYSDATE
+    	WHERE task_id = #{taskId}
+	</update>	
 	
 	<!-- 수정 -->
 	<update id="updateProjectTime" parameterType="WorkTimeVO">

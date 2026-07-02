@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -26,12 +27,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
+import com.weple.cloud.admin.service.UserService;
+import com.weple.cloud.admin.service.UserVO;
 import com.weple.cloud.auth.service.LoginUserDetails;
 import com.weple.cloud.file.FileDownloadDTO;
+import com.weple.cloud.file.TaskFileVO;
 import com.weple.cloud.history.task.service.TaskHistoryService;
 import com.weple.cloud.notification.service.AlarmType;
 import com.weple.cloud.notification.service.NotificationService;
 import com.weple.cloud.project.service.ProjectService;
+import com.weple.cloud.system.service.CodeValueService;
+import com.weple.cloud.system.service.CodeValueVO;
 import com.weple.cloud.task.service.TaskCommentVO;
 import com.weple.cloud.task.service.TaskHistoryDTO;
 import com.weple.cloud.task.service.TaskMemberVO;
@@ -41,6 +47,7 @@ import com.weple.cloud.task.service.TaskService;
 import com.weple.cloud.task.service.TaskSpentTimeVO;
 import com.weple.cloud.task.service.TaskTestCaseDTO;
 import com.weple.cloud.task.service.TaskVO;
+import com.weple.cloud.time.service.ProjectTimeSettingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +60,9 @@ public class TaskController {
 	private final ProjectService projectService;
 	private final TaskHistoryService taskHistoryService; // 작업내역 일감 불러오기
 	private final NotificationService notificationService;
+	private final UserService userService;
+	private final CodeValueService codeValueService;
+	private final ProjectTimeSettingService projectTimeSettingService;
 	
 	//프로젝트 내부 일감 목록 페이지 로드
 	@GetMapping("/project/task")
@@ -178,7 +188,15 @@ public class TaskController {
 				if (!isAdminOrOwner && !isInsertAble) {
 					return "weple/access-denide";
 				}
-
+				
+		// 시작일 마감일 선택 범위 프로젝트 기간
+		TaskProjectSelectVO projectPeriod = taskService.findprojectPeriod(pId);		
+	
+		
+		memberList.removeIf(member -> member.getUserCode().equals(userCode));
+		
+		
+		model.addAttribute("projectPeriod" , projectPeriod);
 	    // nav 일감 돌아가기 위해서 projectId 넘김
 		model.addAttribute("projectId", pId);
 	    // 내게 할당에서 현재 로그인 정보 확인
@@ -217,6 +235,14 @@ public class TaskController {
 
 	    taskService.insertTask(taskVO, files);
 	    TaskVO createdTask = taskService.findTaskDetail(taskVO.getTaskId());
+	    
+	    String newFiles = "";
+	    if (createdTask.getFileList() != null && !createdTask.getFileList().isEmpty()) {
+	        newFiles = createdTask.getFileList().stream()
+	                .map(TaskFileVO::getLogicalName) // TaskFileVO에서 localName만 추출
+	                .collect(Collectors.joining(", ")); // 콤마로 연결 (예: "파일1.txt, 파일2.png")
+	    }
+
 	    // 작업내역 등록 - 은지
 	    taskHistoryService.insertHistory(
 	    		createdTask.getTaskId(), userCode, "CREATE",
@@ -230,10 +256,19 @@ public class TaskController {
 	    	    null, toStr(createdTask.getFinishDate()),
 	    	    null, toStr(createdTask.getEstimatedTime()),
 	    	    null, toStr(createdTask.getTaskProgress()),
-	    	    null, createdTask.getParentTaskTitle()
+	    	    null, createdTask.getParentTaskTitle(),
+	    	    null ,toStr(createdTask.getSpentHoursSum()),
+	    	    null, newFiles
 	    	);
+	    if (createdTask.getParentTaskId() != null && !createdTask.getParentTaskId().trim().isEmpty()) {
+            taskHistoryService.insertSubTaskHistory(
+                createdTask.getParentTaskId(), 
+                userCode,                     
+                createdTask.getTaskTitle()     
+            );
+        }
 	    
-	    return "redirect:/project/task?projectId=" + pId;
+	    return "redirect:/project/task/detail/" + taskVO.getTaskId() + "?projectId=" + pId;
 	}
 	
 	//일감 상세조회 값 로드
@@ -266,11 +301,24 @@ public class TaskController {
 		List<TaskVO> childTaskList = taskService.findChildTask(tId);
 		List<TaskHistoryDTO> updateHistoryList = taskService.taskUpdateHistory(tId);
 		List<TaskSpentTimeVO> spentTimeList = taskService.taskSpentTime(tId);
-		Long spentSum = spentTimeList.stream()
-		        .mapToLong(TaskSpentTimeVO::getSpentHour)
-		        .sum();
+
+		System.out.println("여기 :" + taskDetail);
 		
-		System.out.println("항목 변경 이력 :" + updateHistoryList);
+		// 일감 상세조회 페이지의 소요시간 등록 모달창 띄우기 - 민지
+		// 소요시간 등록 모달용 - 프로젝트 참여자 목록
+		List<UserVO> userList = userService.findUsersByProjectId(String.valueOf(pId));
+
+		// 소요시간 등록 모달용 - 작업분류 목록 (사용중인 것 중, 이 프로젝트가 사용 선택한 것만)
+		List<CodeValueVO> workTypeList = codeValueService.findCodeValueAll(loginUser.getLoginUser().getCompanyId()).stream()
+		        .filter(vo -> vo.getWorkName() != null && !vo.getWorkName().isEmpty())
+		        .filter(vo -> "Y".equals(vo.getUsingYn()))
+		        .collect(Collectors.toList());
+		List<String> selectedClassificationIds = projectTimeSettingService.findSelectedClassificationIds(pId);
+		if (selectedClassificationIds != null && !selectedClassificationIds.isEmpty()) {
+		    workTypeList = workTypeList.stream()
+		            .filter(vo -> selectedClassificationIds.contains(vo.getTaskClassificationId()))
+		            .collect(Collectors.toList());
+		} //여기까지 민지
 		
 		model.addAttribute("currentUserCode", userCode);
 		model.addAttribute("currentMenu", "task");
@@ -281,11 +329,14 @@ public class TaskController {
 		model.addAttribute("taskComment", taskComment);
 		model.addAttribute("updateHistoryList", updateHistoryList);
 		model.addAttribute("spentTimeList", spentTimeList);
-		model.addAttribute("spentSum", spentSum);
 		model.addAttribute("taskPerms",taskPerms);
 		model.addAttribute("isAdminOrOwner",isAdminOrOwner);
 		model.addAttribute("sidebarMenu", "project");
 		model.addAttribute("project", projectService.findById(String.valueOf(pId)));
+		model.addAttribute("userList", userList);
+		model.addAttribute("workTypeList", workTypeList);
+		model.addAttribute("loginUserCode", userCode);
+		model.addAttribute("loginUserName", loginUser.getLoginUser().getUserName());
 		return "weple/task/detail";
 	}
 	
@@ -482,6 +533,8 @@ public class TaskController {
 	    if (!isProjectMember && !isAdminOrOwner) {
 	        return "weple/access-denide";
 	    }
+	    
+	    
 
 	    // 수정할 일감 조회
 	    TaskVO taskDetail = taskService.findTaskDetail(tId);
@@ -513,7 +566,9 @@ public class TaskController {
 	            }
 	        }
 	    }
-
+	    TaskProjectSelectVO projectPeriod = taskService.findprojectPeriod(pId);
+	    memberList.removeIf(member -> member.getUserCode().equals(userCode));
+	    model.addAttribute("projectPeriod" , projectPeriod);
 	    model.addAttribute("currentMenu", "task");
 	    model.addAttribute("projectId", pId);
 	    model.addAttribute("taskDetail", taskDetail);
@@ -545,13 +600,26 @@ public class TaskController {
 
 	    // 수정 전 값 먼저 조회-은지
 	    TaskVO before = taskService.findTaskDetail(taskVO.getTaskId());
-	    String oldTitle = before.getTaskTitle();
-	    String oldTypeName = before.getTypeIdName();
+
+	    
+	    String oldFiles = "";
+	    if (before.getFileList() != null && !before.getFileList().isEmpty()) {
+	        oldFiles = before.getFileList().stream()
+	                .map(TaskFileVO::getLogicalName)
+	                .collect(Collectors.joining(", "));
+	    }
 	    
 	    // 수정 처리 서비스 호출 (VO 내부에 taskId가 hidden으로 담겨서 넘어옵니다)
 	    taskService.updateTask(taskVO, files, deletedFileIds);
 	    
 	    TaskVO after = taskService.findTaskDetail(taskVO.getTaskId());
+	    
+	    String newFiles = "";
+	    if (after.getFileList() != null && !after.getFileList().isEmpty()) {
+	        newFiles = after.getFileList().stream()
+	                .map(TaskFileVO::getLogicalName)
+	                .collect(Collectors.joining(", "));
+	    }
 	    
 	    // 알림-은지(상태 변경)
 	    boolean statusChanged = before.getTaskStatusId() != null
@@ -596,7 +664,9 @@ public class TaskController {
 	          toStr(before.getFinishDate()),      toStr(after.getFinishDate()),
 	          toStr(before.getEstimatedTime()),   toStr(after.getEstimatedTime()),
 	          toStr(before.getTaskProgress()),    toStr(after.getTaskProgress()),
-	          before.getParentTaskTitle(),        after.getParentTaskTitle()
+	          before.getParentTaskTitle(),        after.getParentTaskTitle(),
+	          toStr(before.getSpentHoursSum()), toStr(after.getSpentHoursSum()),
+	          oldFiles,                           newFiles
 	    	);
 	    
 	    // 수정 완료 후 해당 일감의 상세조회 페이지로 리다이렉트
@@ -619,6 +689,12 @@ public class TaskController {
 	    System.out.println("aaa:" + before);
 	    String oldTitle = before.getTaskTitle();
 	    String oldTypeName = before.getTypeIdName();
+	    String oldFiles = "";
+	    if (before.getFileList() != null && !before.getFileList().isEmpty()) {
+	        oldFiles = before.getFileList().stream()
+	                .map(TaskFileVO::getLogicalName)
+	                .collect(Collectors.joining(", "));
+	    }
 	    
 	    // 소프트 딜리트 실행 (기존 공통 로직)
 	    taskService.deleteTask(tId);
@@ -636,7 +712,10 @@ public class TaskController {
             toStr(before.getFinishDate()),      null,
             toStr(before.getEstimatedTime()),   null,
             toStr(before.getTaskProgress()),    null,
-            before.getParentTaskId(),           null
+            before.getParentTaskId(),           null,
+            toStr(before.getSpentHoursSum()),    null,
+            oldFiles,                           null
+            
 	    );
 	    
 	    // 해당 프로젝트의 일감 목록 페이지로 리다이렉트
