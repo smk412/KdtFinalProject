@@ -320,7 +320,7 @@ public class TaskServiceImpl implements TaskService {
 
 	// 댓글 목록 조회
 	@Override
-	public List<TaskCommentVO> findTaskComment(String tId) {
+	public List<TaskCommentVO>findTaskComment(String tId) {
 		return taskMapper.taskCommentList(tId);
 	}
 

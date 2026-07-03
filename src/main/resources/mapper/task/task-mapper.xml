@@ -492,6 +492,7 @@ END;
     <where>
         t.project_id = #{projectId} 
         AND t.deleted_yn = 'N'
+        
 
         <if test="searchKeyword != null and searchKeyword != ''">
             AND t.task_title LIKE '%' || #{searchKeyword} || '%'
@@ -752,12 +753,8 @@ END;
 </select>
 <!-- 검색에 대한 일감전체 갯수 -->
 <select id="countAllWithFilters" resultType="int" parameterType="map">
-    SELECT COUNT(*)
+    SELECT COUNT(t.task_id)
     FROM task t
-    INNER JOIN project p ON t.project_id = p.project_id
-    INNER JOIN task_types tt ON t.type_id = tt.type_id
-    INNER JOIN common_code cc ON t.task_status = cc.common_id
-    LEFT JOIN users u ON t.task_manager = u.user_code
     <include refid="internalTaskConditions" />
 </select>
    

@@ -13,6 +13,7 @@
             'MY_TASK' AS "eventType"
         FROM task
         WHERE deleted_yn = 'N'
+        AND project_id = #{projectId}
 
         UNION ALL
 
@@ -28,6 +29,7 @@
             ON m.milestone_id = t.milestone_id
            AND t.deleted_yn = 'N'
         WHERE m.milestone_status = 'g1'
+         AND m.project_id = #{projectId}
         GROUP BY
             m.milestone_id,
             m.milestone_title,
