@@ -2,6 +2,7 @@ package com.weple.cloud.system.controller;
 
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -344,7 +345,7 @@ public class SystemController {
 		}
 		model.addAttribute("codeList", codeList);
 		model.addAttribute("codeList", codeList);
-		model.addAttribute("menu", "codeValue");
+		model.addAttribute("menu", "code");
 		model.addAttribute("sidebarMenu", "system");
 
 		return "weple/admin/code/list";
@@ -950,6 +951,7 @@ public class SystemController {
 	    Long companyId = loginUser.getLoginUser().getCompanyId();
 
 	    List<SystemModuleVO> moduleList = systemModuleService.findModuleAll();
+	    moduleList.sort(Comparator.comparingInt(m -> moduleDisplayOrder(m.getDefaultDescribe())));
 	    List<String> enabledCodes = systemModuleService.findEnabledModuleCodes(companyId);
 	    List<TaskTypeVO> taskTypeList = taskTypeService.findTaskTypeAll(companyId);
 	    List<String> enabledTaskTypeIds = systemModuleService.findEnabledTaskTypeIds(companyId);
@@ -974,7 +976,20 @@ public class SystemController {
 	    Long companyId = loginUser.getLoginUser().getCompanyId();
 
 	    try {
-	        systemModuleService.saveEnabledModules(companyId, enabledModules);
+	        // "개요"/"설정"은 화면에서 항상 체크+비활성(disabled) 상태라 폼에서 아예 값이 안 넘어옴.
+	        // 그래서 서버에서 강제로 포함시켜 저장한다.
+	        List<String> finalEnabledModules = new ArrayList<>();
+	        if (enabledModules != null) {
+	            finalEnabledModules.addAll(enabledModules);
+	        }
+	        for (SystemModuleVO m : systemModuleService.findModuleAll()) {
+	            if (("개요".equals(m.getDefaultDescribe()) || "설정".equals(m.getDefaultDescribe()))
+	                    && !finalEnabledModules.contains(m.getCommonId())) {
+	                finalEnabledModules.add(m.getCommonId());
+	            }
+	        }
+
+	        systemModuleService.saveEnabledModules(companyId, finalEnabledModules);
 	        systemModuleService.saveEnabledTaskTypes(companyId, enabledTaskTypes);
 	        redirectAttributes.addFlashAttribute("toastType", "success");
 	        redirectAttributes.addFlashAttribute("toastMessage", "모듈 설정이 저장되었습니다.");
@@ -984,6 +999,18 @@ public class SystemController {
 	    }
 
 	    return "redirect:/system/systemModules";
+	}
+
+	// 새 프로젝트 모듈 설정 화면에 노출할 고정 순서
+	// (개요, 작업내역, 마일스톤, 일감, 소요시간, 간트차트, 테스트, 위키, 파일관리, 저장소, 칸반보드, 캘린더, 설정)
+	private static final List<String> MODULE_DISPLAY_ORDER = List.of(
+	        "개요", "작업내역", "마일스톤", "일감", "소요시간", "간트차트",
+	        "테스트", "위키", "파일관리", "저장소", "칸반보드", "캘린더", "설정"
+	);
+
+	private int moduleDisplayOrder(String defaultDescribe) {
+	    int idx = MODULE_DISPLAY_ORDER.indexOf(defaultDescribe);
+	    return idx == -1 ? MODULE_DISPLAY_ORDER.size() : idx;
 	}
 	
 	

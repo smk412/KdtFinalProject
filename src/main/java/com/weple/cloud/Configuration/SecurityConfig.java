@@ -97,6 +97,14 @@ public class SecurityConfig {
                 .requestMatchers("codeValueList", "/codeInsert", "codeUpdate", "/updateOrder")
                 .hasAnyAuthority("ROLE_COMPANY_OWNER", "ROLE_COMPANY_ADMIN")
                 
+                // 그룹 관리·코드값 관리는 기업 최고관리자 또는 관리자만 접근할 수 있음
+                .requestMatchers(
+                    "/groupList", "/groupInsert", "/groupDelete",
+                    "/groupUserList", "/groupUserInsert", "/groupUserUpdate", "/groupUserDelete",
+                    "/codeValueList", "/codeInsert", "/codeUpdate", "/updateOrder"
+                )
+                .hasAnyAuthority("ROLE_COMPANY_OWNER", "ROLE_COMPANY_ADMIN")
+                
                 // 그 외 요청은 로그인 필요
                 .anyRequest().authenticated()
             )
