@@ -82,6 +82,13 @@ public class SystemController {
 		return "redirect:groupList";
 	}
 
+	// 수정 (그룹 목록 페이지 내 모달에서 바로 처리)
+	@PostMapping("groupUpdate")
+	public String groupUpdateProcess(SystemGroupVO systemGroupVO) {
+		groupService.modifyGroup(systemGroupVO);
+		return "redirect:groupList";
+	}
+
 	// 삭제
 	@GetMapping("groupDelete")
 	public String groupDelete(Integer groupId) {

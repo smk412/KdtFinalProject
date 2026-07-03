@@ -103,7 +103,7 @@ public class SecurityConfig {
                 
                 // 그룹 관리·코드값 관리는 기업 최고관리자 또는 관리자만 접근할 수 있음
                 .requestMatchers(
-                    "/groupList", "/groupInsert", "/groupDelete",
+                    "/groupList", "/groupInsert", "/groupUpdate", "/groupDelete",
                     "/groupUserList", "/groupUserInsert", "/groupUserUpdate", "/groupUserDelete",
                     "/codeValueList", "/codeInsert", "/codeUpdate", "/codeDelete", "/updateOrder"
                 )

@@ -21,7 +21,7 @@
 				</div>
 				<a class="project-create-btn" th:href="@{/groupInsert}">
 					<i class="fa fa-folder"></i>
-					<span>새 그룹 추가</span>
+					<span>+ 새 그룹 추가</span>
 				</a>
 			</div>
 
@@ -52,6 +52,9 @@
 									<div class="dropdown-wrapper">
 										<span class="more-options-btn" onclick="toggleDropdown(this)">•••</span>
 										<div class="dropdown-menu-box">
+											<button type="button" class="dropdown-item edit-btn"
+												th:data-id="${info.groupId}" th:data-name="${info.groupName}"
+												onclick="openGroupEditModal(this)">✏️ 편집</button>
 											<button type="button" class="dropdown-item delete-btn"
 												th:data-id="${info.groupId}" th:data-name="${info.groupName}">
 												🗑️ 삭제</button>
@@ -65,6 +68,23 @@
 			</div>
 
 			<div class="pagination-wrap" id="paginationWrap"></div>
+		</div>
+
+		<!-- 그룹명 편집 모달 -->
+		<div id="groupEditModal" class="wiki-confirm-overlay" style="display: none;">
+			<div class="wiki-confirm-box" style="text-align: left;">
+				<p class="wiki-confirm-title" style="text-align: center; margin-bottom: 18px;">그룹명 편집</p>
+				<form id="groupEditForm" method="post" th:action="@{/groupUpdate}">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+					<input type="hidden" id="groupEditId" name="groupId">
+					<input type="text" id="groupEditNameInput" name="groupName" maxlength="50" required
+						style="width:100%; height:40px; padding:0 12px; border:1px solid #DDD6FE; border-radius:8px; font-size:14px; outline:none; box-sizing:border-box; margin-bottom:20px;">
+					<div class="wiki-confirm-actions">
+						<button type="button" class="wiki-confirm-btn wiki-confirm-cancel" onclick="closeGroupEditModal()">취소</button>
+						<button type="submit" class="wiki-confirm-btn wiki-confirm-ok" style="background:#6D5EF7;">저장</button>
+					</div>
+				</form>
+			</div>
 		</div>
 		<script>
       // 삭제 확인 모달 (위키 삭제 모달과 동일한 스타일)
@@ -101,6 +121,21 @@
           });
           el.nextElementSibling.classList.toggle('show');
       }
+
+      // 그룹명 편집 모달
+      function openGroupEditModal(btn) {
+          document.getElementById('groupEditId').value = btn.dataset.id;
+          document.getElementById('groupEditNameInput').value = btn.dataset.name;
+          document.getElementById('groupEditModal').style.display = 'flex';
+          document.getElementById('groupEditNameInput').focus();
+      }
+      function closeGroupEditModal() {
+          document.getElementById('groupEditModal').style.display = 'none';
+      }
+      document.getElementById('groupEditModal').addEventListener('click', function (e) {
+          if (e.target === this) closeGroupEditModal();
+      });
+
       document.addEventListener('click', function () {
           document.querySelectorAll('.dropdown-menu-box').forEach(menu => menu.classList.remove('show'));
       });
