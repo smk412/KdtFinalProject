@@ -196,7 +196,8 @@
 		            
 		            
 		        </div>
-		        <div class="milestone-action-group" style="display: flex; gap: 8px; flex-shrink: 0;">
+                
+                <div class="milestone-action-group" th:if="${canManageMilestone}" style="display: flex; gap: 8px; flex-shrink: 0;">
 		            <button type="button" class="milestone-edit-btn" th:onclick="|location.href='@{/project/milestone/update(projectId=${projectId}, milestoneId=${detail.milestoneId})}'|">편집</button>
 		            <button type="button" class="milestone-delete-btn milestone-delete-trigger" 
 				            th:data-milestone-id="${detail.milestoneId}"
@@ -336,13 +337,16 @@
 			            </h3>
 			            
 			            <div style="display: flex; gap: 8px;">
-			                <span id="btnOpenModal" class="milestone-add-link" style="cursor: pointer;">
-					            + 기존 일감 연결
-					        </span>
-			                <button type="submit" class="milestone-add-link" id="btnSaveMapping" style="background: #2563eb; color: #fff; display: none;">
-			                    💾 연결 저장
-			                </button>
-			                <a th:href="@{/project/task/insert(projectId=${detail.projectId}, milestoneId=${detail.milestoneId})}" class="milestone-add-link">
+                            <!-- <th:block th:if="${canManageMilestone}"> -->
+                                <span id="btnOpenModal" class="milestone-add-link" style="cursor: pointer;">
+                                    + 기존 일감 연결
+                                </span>
+                                <button type="submit" class="milestone-add-link" id="btnSaveMapping" style="background: #2563eb; color: #fff; display: none;">
+                                    💾 연결 저장
+                                </button>
+                            <!-- </th:block> -->
+                            
+                            <a th:href="@{/project/task/insert(projectId=${detail.projectId}, milestoneId=${detail.milestoneId})}" class="milestone-add-link">
 			                    + 새 일감 추가
 			                </a>
 			            </div>
@@ -408,7 +412,7 @@
                 
                 <dialog class="milestone-delete-dialog" id="milestoneDeleteDialog" aria-labelledby="milestoneDeleteDialogTitle">
 				    <div class="milestone-delete-dialog-header">
-				        <h2 id="milestoneDeleteDialogTitle">마일스톤 삭제</h2>
+				        <h2>마일스톤 삭제</h2>
 				        <button class="milestone-dialog-close" type="button" aria-label="닫기" data-milestone-delete-close>&times;</button>
 				    </div>
 				    <p><strong id="milestoneDeleteName" style="color: #ff4d4f;">마일스톤명</strong>을(를) 삭제합니다. 하위 일감이나 관련 데이터가 함께 영향받을 수 있으며, 이 작업은 되돌릴 수 없습니다.</p>

@@ -271,7 +271,6 @@ public class MilestoneController {
 	@GetMapping("/unassigned-tasks")
 	@ResponseBody
 	public Map<String, Object> getUnassignedTasks(
-			@AuthenticationPrincipal LoginUserDetails loginUser, // [추가]
 	        @RequestParam("projectId") Long projectId,
 	        @RequestParam(value = "milestoneId", required = false) Long milestoneId, 
 	        @RequestParam(value = "page", defaultValue = "1") int page,
@@ -280,14 +279,7 @@ public class MilestoneController {
 	        @RequestParam(value = "taskManager", required = false) String taskManager,
 	        @RequestParam(value = "typeId", required = false) Long typeId) {
 	        
-		// 비동기 요청 보안 검증: 권한이 없다면 에러 메시지 반환
-		Set<String> permissionCodes = findMilestonePermissionCodes(loginUser, projectId);
-		if (!hasMilestonePermission(permissionCodes, PERMISSION_MILESTONE_CREATE_UPDATE_DELETE)) {
-			Map<String, Object> errorResult = new HashMap<>();
-			errorResult.put("error", "해당 프로젝트의 마일스톤 관리 권한이 없습니다.");
-			return errorResult;
-		}
-
+		
 	    int pageSize = 10;
 	    int startRow = (page - 1) * pageSize + 1;
 	    int endRow = page * pageSize;
