@@ -9,14 +9,6 @@
     <meta name="_csrf_parameter" th:content="${_csrf.parameterName}"/>
     
     <style>
-        /* 기본 배경 및 레이아웃 설정 */
-        body {
-            background-color: #f8f9fc;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 1.45rem; 
-        }
-        
-        /* 대시보드 가로 2:1:1 구조 컨테이너 */
         .dashboard-container {
             display: grid;
             grid-template-columns: 3fr 1fr 1fr; /* 2:1:1 비율 */
@@ -24,11 +16,21 @@
             padding: 16px 8px;
             max-width: 100%;
             margin: 0 auto;
-            align-items: stretch; /* [수정] 자식 카드들의 높이를 통일하기 위해 stretch 설정 */
+            align-items: stretch;
+            
+            /* 전역 body 오염 방지를 위해 컨테이너 내부 전용 폰트 크기 정의 */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 1.45rem; 
+            box-sizing: border-box;
+        }
+        
+        /* 대시보드 내부의 모든 요소에 box-sizing 일괄 적용 */
+        .dashboard-container * {
+            box-sizing: border-box;
         }
 
         /* 대시보드 메인 카드 스타일 */
-        .dashboard-card {
+        .dashboard-container .dashboard-card {
             background: #ffffff;
             border: 1px solid #eef2f5;
             border-radius: 24px; 
@@ -36,12 +38,11 @@
             padding: 32px;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
-            height: 700px; /* [수정] 세 영역의 전체 높이를 700px로 통일 */
+            height: 700px; /* 세 영역의 전체 높이를 700px로 통일 */
         }
 
         /* 각 영역의 메인 소제목 */
-        .card-header-title {
+        .dashboard-container .card-header-title {
             font-size: 1.8rem; 
             font-weight: 800;
             color: #1e293b;
@@ -50,40 +51,40 @@
             align-items: center;
             justify-content: space-between;
             min-height: 46px;
-            flex-shrink: 0; /* [추가] 헤더 영역이 축소되지 않도록 고정 */
+            flex-shrink: 0; 
         }
 
         /* 대량 데이터 및 균형을 위한 스크롤바 일괄 적용 */
-        .scrollable-body {
-            flex-grow: 1; /* [수정] 남은 카드의 세로 영역을 꽉 채우도록 설정 */
+        .dashboard-container .scrollable-body {
+            flex-grow: 1; 
             overflow-y: auto;  
             padding-right: 12px;
         }
 
-        /* 스크롤바 커스텀 */
-        .scrollable-body::-webkit-scrollbar {
+        /* 스크롤바 커스텀 (대시보드 내부 한정) */
+        .dashboard-container .scrollable-body::-webkit-scrollbar {
             width: 8px;
         }
-        .scrollable-body::-webkit-scrollbar-track {
+        .dashboard-container .scrollable-body::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 6px;
         }
-        .scrollable-body::-webkit-scrollbar-thumb {
+        .dashboard-container .scrollable-body::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 6px;
         }
-        .scrollable-body::-webkit-scrollbar-thumb:hover {
+        .dashboard-container .scrollable-body::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
         
-        /* 프로젝트 카드가 1row에 3개씩 배치되도록 설정 */
-        .project-card-grid {
+        /* 프로젝트 카드가 1row에 4개씩 배치되도록 설정 */
+        .dashboard-container .project-card-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 3열 고정 배치 */
+            grid-template-columns: repeat(4, 1fr); 
             gap: 20px; 
         }
 
-        .project-item-card {
+        .dashboard-container .project-item-card {
             background: #ffffff;
             border: 1px solid #eef2f5;
             border-radius: 20px;
@@ -98,13 +99,13 @@
             color: inherit;
         }
 
-        .project-item-card:hover {
+        .dashboard-container .project-item-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
-        /* 프로젝트 제목 */
-        .project-info-top h4 {
+        /* [수정] 태그 선택자 전역 오염 방지 */
+        .dashboard-container .project-info-top .project-title-text {
             font-size: 1.5rem; 
             font-weight: 700;
             color: #1e293b;
@@ -114,8 +115,8 @@
             text-overflow: ellipsis; 
         }
 
-        /* 프로젝트 본문 설명 */
-        .project-info-top p {
+        /* [수정] 태그 선택자 전역 오염 방지 */
+        .dashboard-container .project-info-top .project-desc-text {
             font-size: 1.3rem; 
             color: #64748b;
             margin: 0;
@@ -126,11 +127,11 @@
             overflow: hidden;
         }
 
-        .project-progress-section {
+        .dashboard-container .project-progress-section {
             margin-top: 20px;
         }
 
-        .progress-bar-container {
+        .dashboard-container .progress-bar-container {
             width: 100%;
             height: 12px; 
             background-color: #f1f5f9;
@@ -139,40 +140,41 @@
             margin-bottom: 10px;
         }
 
-        .progress-bar-fill {
+        .dashboard-container .progress-bar-fill {
             height: 100%;
             border-radius: 8px;
             width: 0%; 
             transition: width 0.5s ease-in-out;
         }
 
-        .bg-blue   { background-color: #4e73df; }
-        .bg-orange { background-color: #f6c23e; }
-        .bg-green  { background-color: #1cc88a; }
-        .bg-gray   { background-color: #beabc2; }
+        /* 다른 요소와 겹치지 않게 대시보드 전용 색상 클래스로 명시력 강화 */
+        .dashboard-container .bg-blue   { background-color: #4e73df; }
+        .dashboard-container .bg-orange { background-color: #f6c23e; }
+        .dashboard-container .bg-green  { background-color: #1cc88a; }
+        .dashboard-container .bg-gray   { background-color: #beabc2; }
 
-        .progress-txt-container {
+        .dashboard-container .progress-txt-container {
             display: flex;
             justify-content: space-between;
             font-size: 1.2rem; 
             color: #64748b;
         }
 
-        .progress-count { font-weight: 500; }
-        .progress-percent { font-weight: 700; color: #4e73df; }
+        .dashboard-container .progress-count { font-weight: 500; }
+        .dashboard-container .progress-percent { font-weight: 700; color: #4e73df; }
 
         /* 마감 임박 카드 컴포넌트 테마 */
-        .upcoming-box {
+        .dashboard-container .upcoming-box {
             border-top: 5px solid #f43f5e; 
         }
         
-        .task-card-list {
+        .dashboard-container .task-card-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
-        .task-item-card {
+        .dashboard-container .task-item-card {
             display: flex;
             align-items: center;
             gap: 20px;
@@ -186,12 +188,12 @@
             color: inherit;
         }
 
-        .task-item-card:hover {
+        .dashboard-container .task-item-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
         }
 
-        .dday-badge {
+        .dashboard-container .dday-badge {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -202,19 +204,18 @@
             font-size: 1.4rem; 
             flex-shrink: 0;
         }
-        .badge-danger { background-color: #fff1f2; color: #f43f5e; }  
-        .badge-warning { background-color: #fffbeb; color: #d97706; } 
-        .badge-info { background-color: #eff6ff; color: #2563eb; }    
+        .dashboard-container .badge-danger { background-color: #fff1f2; color: #f43f5e; }  
+        .dashboard-container .badge-warning { background-color: #fffbeb; color: #d97706; } 
+        .dashboard-container .badge-info { background-color: #eff6ff; color: #2563eb; }    
 
-        .task-card-info {
+        .dashboard-container .task-card-info {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            overflow: hidden; /* 글자가 박스 밖으로 탈출하는 것 방지 */
+            overflow: hidden; 
         }
 
-        /* 일감 제목 */
-        .task-card-title {
+        .dashboard-container .task-card-title {
             font-size: 1.55rem; 
             font-weight: 600;
             color: #334155;
@@ -223,7 +224,7 @@
             text-overflow: ellipsis;
         }
 
-        .task-card-project {
+        .dashboard-container .task-card-project {
             font-size: 1.35rem; 
             color: #94a3b8;
             white-space: nowrap;
@@ -231,7 +232,8 @@
             text-overflow: ellipsis;
         }
 
-        .loading-spinner, .empty-msg {
+        .dashboard-container .loading-spinner, 
+        .dashboard-container .empty-msg {
             text-align: center;
             padding: 100px 0;
             color: #94a3b8;
@@ -239,7 +241,7 @@
         }
         
         /* 드롭다운 공통 스타일 정의 */
-        .card-header-select {
+        .dashboard-container .card-header-select {
             padding: 10px 40px 10px 18px;
             font-size: 1.4rem; 
             font-weight: 500;
@@ -256,19 +258,18 @@
             appearance: none;
             transition: border-color 0.2s;
         }
-        .card-header-select:focus {
+        .dashboard-container .card-header-select:focus {
             border-color: #94a3b8;
         }
         
-        /* 헤더 내 필터 요소들을 감싸는 컨테이너 */
-		.card-header-filters {
+		.dashboard-container .card-header-filters {
 		    display: flex;
 		    gap: 10px;
 		    align-items: center;
 		}
 		
 		/* 날짜 필터 스타일 커스텀 */
-		.card-header-date {
+		.dashboard-container .card-header-date {
 		    padding: 10px 14px;
 		    font-size: 1.4rem;
 		    font-weight: 500;
@@ -281,12 +282,12 @@
 		    font-family: inherit;
 		    transition: border-color 0.2s;
 		}
-		.card-header-date:focus {
+		.dashboard-container .card-header-date:focus {
 		    border-color: #94a3b8;
 		}
 
         /* 수직 타임라인 레이아웃 구조 */
-        .timeline-container {
+        .dashboard-container .timeline-container {
             position: relative;
             padding-left: 44px;
             display: flex;
@@ -295,7 +296,7 @@
         }
 
         /* 타임라인 가로수직 기둥 선 */
-        .timeline-container::before {
+        .dashboard-container .timeline-container::before {
             content: '';
             position: absolute;
             left: 19px;
@@ -305,7 +306,7 @@
             background-color: #f1f5f9;
         }
 
-        .timeline-item {
+        .dashboard-container .timeline-item {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -313,7 +314,7 @@
         }
 
         /* 마커 서클 확대 */
-        .timeline-marker {
+        .dashboard-container .timeline-marker {
             position: absolute;
             left: -44px;
             top: 4px;
@@ -326,22 +327,22 @@
             align-items: center;
             justify-content: center;
         }
-        .marker-create { border-color: #bfdbfe; background-color: #eff6ff; } 
-        .marker-update { border-color: #bbf7d0; background-color: #f0fdf4; } 
-        .marker-comment { border-color: #fed7aa; background-color: #fff7ed; } 
-        .marker-wiki    { border-color: #e9d5ff; background-color: #f3e8ff; } 
+        .dashboard-container .marker-create { border-color: #bfdbfe; background-color: #eff6ff; } 
+        .dashboard-container .marker-update { border-color: #bbf7d0; background-color: #f0fdf4; } 
+        .dashboard-container .marker-comment { border-color: #fed7aa; background-color: #fff7ed; } 
+        .dashboard-container .marker-wiki    { border-color: #e9d5ff; background-color: #f3e8ff; } 
 
         /* 최근 활동 본문 */
-        .timeline-info {
+        .dashboard-container .timeline-info {
             font-size: 1.55rem; 
             color: #334155;
             line-height: 1.6;
         }
-        .timeline-info strong {
+        .dashboard-container .timeline-info strong {
             color: #1e293b;
             font-weight: 700;
         }
-        .timeline-meta {
+        .dashboard-container .timeline-meta {
             font-size: 1.35rem; 
             color: #94a3b8;
             margin-top: 6px;
@@ -349,7 +350,7 @@
 
         /* 반응형 태블릿/모바일 대응 */
         @media (max-width: 1400px) {
-            .project-card-grid {
+            .dashboard-container .project-card-grid {
                 grid-template-columns: repeat(2, 1fr); 
             }
         }
@@ -359,11 +360,11 @@
                 grid-template-columns: 1fr;
                 gap: 24px;
             }
-            .project-card-grid {
+            .dashboard-container .project-card-grid {
                 grid-template-columns: 1fr; 
             }
-            .dashboard-card {
-                height: auto; /* 모바일이나 화면 폭이 좁아질 때는 높이 자동 조절 */
+            .dashboard-container .dashboard-card {
+                height: auto; 
                 max-height: 700px;
             }
         }
@@ -503,8 +504,8 @@
             html += `
                 <a href="/project/outline?projectId=${project.projectId}" class="project-item-card">
                     <div class="project-info-top">
-                        <h4>${escapeHtml(project.projectTitle)}</h4>
-                        <p>${escapeHtml(project.projectDescribe || '설명이 등록되지 않은 프로젝트입니다.')}</p>
+                        <h4 class="project-title-text">${escapeHtml(project.projectTitle)}</h4>
+                        <p class="project-desc-text">${escapeHtml(project.projectDescribe || '설명이 등록되지 않은 프로젝트입니다.')}</p>
                     </div>
                     
                     <div class="project-progress-section">
