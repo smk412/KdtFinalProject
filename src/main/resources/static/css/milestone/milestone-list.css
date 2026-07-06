@@ -14,8 +14,8 @@
 
 .milestone-page-title {
     margin: 0;
-    color: #433D74; /* 공통 테마 타이틀 톤 일치 */
-    font-size: 30px;
+    color: #222; /* ★ 변경: #433D74 -> #222 (project-title과 통일) */
+    font-size: 24px;   /* ★ 변경: 30px -> 24px (다른 페이지 제목과 크기 통일) */
     font-weight: 700;
 }
 
@@ -84,8 +84,8 @@
 }
 
 .badge-success {
-    background-color: #e6f4ea;
-    color: #137333;
+    background-color: #F3F4F6;   /* ★ 변경: #e6f4ea -> #F3F4F6 (project.css status-done과 통일) */
+    color: #9ea7b8;               /* ★ 변경: #137333 -> #9ea7b8 */
 }
 
 .badge-process {
@@ -157,7 +157,7 @@
     width: 200px;
     height: 8px;
     border-radius: 4px;
-    background-color: #e9ecef;
+    background-color: #F1EDFF;   /* ★ 변경: #e9ecef -> #F1EDFF */
     overflow: hidden;
 }
 
@@ -195,7 +195,7 @@
 .task-list-card {
     background-color: #FAFAFC;
     border: 1px solid #DDD6FE;
-    border-radius: 12px;
+    border-radius: 14px;   /* ★ 변경: 12px -> 14px (project-table-wrap과 통일) */
     overflow: hidden;
 }
 
@@ -233,7 +233,7 @@
 .task-mini-bar-wrap {
     width: 88px;
     height: 5px;
-    background-color: #e5e7eb;
+    background-color: #F1EDFF;   /* ★ 변경: #e5e7eb -> #F1EDFF */
     border-radius: 3px;
     overflow: hidden;
 }

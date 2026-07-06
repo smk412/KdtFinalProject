@@ -43,7 +43,7 @@
         .project-table th:nth-child(5), .project-table td:nth-child(5) { width: 16%; }
         .project-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .project-table td:nth-child(3) { white-space: normal; word-break: break-all; }
-        .project-table th { height: 42px; font-size: 12px; font-weight: 700; color: #5d6b87; background: #f8faff; border-bottom: 1px solid #e9edf5; text-align: center; }
+        .project-table th { height: 42px; font-size: 12px; font-weight: 700; color: #5d4a9c; background: #F1EDFF; border-bottom: 1px solid #DDD6FE; text-align: center; }
         .project-table td { height: 50px; padding: 0 15px; border-top: 1px solid #edf1f7; font-size: 13px; color: #495057; text-align: center; }
         .project-table th:nth-child(3), .project-table td:nth-child(3) { text-align: left; padding-left: 20px; }
         .project-table tbody tr:first-child td { border-top: none; }
