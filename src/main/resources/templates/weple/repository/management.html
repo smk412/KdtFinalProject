@@ -8,11 +8,14 @@
     <div class="repository-page">
         <div th:replace="~{common/fragments/project-setting-tabs :: projectSettingTabs}"></div>
 
-        <p class="repository-message repository-message-success" th:if="${repositorySuccess}" th:text="${repositorySuccess}">저장소가 등록되었습니다.</p>
-        <p class="repository-message repository-message-error" th:if="${repositoryError}" th:text="${repositoryError}">요청을 처리할 수 없습니다.</p>
-
-        <div class="repository-management-actions" th:if="${canManageRepository}">
-            <a class="repository-button repository-button-primary repository-add-button" th:href="@{/repository/management/new(projectId=${projectId})}">+ 저장소 추가</a>
+        <div class="repository-management-toolbar">
+            <div class="repository-management-messages">
+                <p class="repository-message repository-message-success" th:if="${repositorySuccess}" th:text="${repositorySuccess}">저장소가 등록되었습니다.</p>
+                <p class="repository-message repository-message-error" th:if="${repositoryError}" th:text="${repositoryError}">요청을 처리할 수 없습니다.</p>
+            </div>
+            <div class="repository-management-actions" th:if="${canManageRepository}">
+                <a class="repository-button repository-button-primary repository-add-button" th:href="@{/repository/management/new(projectId=${projectId})}">+ 저장소 추가</a>
+            </div>
         </div>
 
         <div class="repository-table-wrap">
