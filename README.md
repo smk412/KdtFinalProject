@@ -61,7 +61,6 @@ WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물
         </a>
     </td>
   </tr>
-
   <tr>
     <th align="center">팀장</th>
     <th align="center">부팀장</th>
@@ -69,13 +68,39 @@ WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물
     <th align="center">팀원</th>
     <th align="center">팀원</th>
   </tr>
-
   <tr>
     <td align="center">프로젝트 총괄</td>
     <td align="center">배포</td>
-    <td align="center">DB</td>
-    <td align="center">개발환경</td>
     <td align="center">Git</td>
+    <td align="center">개발환경</td>
+    <td align="center">DB</td>
+  </tr>
+  <tr>
+    <td align="center">
+      일감 관리<br />
+      테스트 케이스<br />
+      캘린더
+    </td>
+    <td align="center">
+      로그인/인증<br />
+      사용자 관리<br />
+      저장소 관리
+    </td>
+    <td align="center">
+      프로젝트, 작업내역<br />
+      위키, 알림<br />
+      마이페이지, 칸반보드
+    </td>
+    <td align="center">
+      그룹, 코드값<br />
+      소요시간<br />
+      파일관리
+    </td>
+    <td align="center">
+      대시보드<br />
+      간트차트<br />
+      보조 기능
+    </td>
   </tr>
 </table>
 
@@ -220,15 +245,3 @@ GitHub push
 → Docker Image Build
 → DockerHub Push
 → 운영 EC2에서 Docker Image Pull & Run
-
-팀 구성
-이름	  주요 담당
-방진영	  일감, 테스트 케이스, 캘린더
-김병완	  로그인 및 인증, 사용자관리, 저장소 연동, 배포
-김은지	  프로젝트, 위키, 알림, 마이페이지, 칸반보드
-김민지	  그룹, 코드값, 소요시간, 파일관리
-송민규	  공통 UI, 대시보드, 간트차트 프로젝트 보조 기능
-
-프로젝트 목표
-WEPLE은 프로젝트 수행에 필요한 업무 관리, 일정 관리, 산출물 관리, 협업 기능을 하나의 플랫폼에서 제공하는 것을 목표로 합니다.
-프로젝트 구성원은 일감과 일정, 파일, 위키, 저장소 이력을 함께 확인할 수 있고, 관리자는 사용자와 권한, 프로젝트 설정을 통합적으로 관리할 수 있습니다.
