@@ -59,6 +59,13 @@
 WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물, 커뮤니케이션, 저장소 이력을 하나의 흐름으로 관리할 수 있는 웹 기반 협업 플랫폼입니다.  
 팀 단위 프로젝트를 진행하면서 구성원, 역할, 권한, 일감, 파일, 위키, 알림, 저장소 정보를 통합적으로 관리하는 것을 목표로 합니다.
 
+
+## 🖥 메인 화면 및 아키텍처 (Overview & Architecture)
+
+### 1. 메인 화면
+<!-- 메인 화면 사진 캡처 이미지 또는 동작 GIF 추가 -->
+<img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/c34f8d77-3bd6-4914-803c-b758498b3167" />
+
 ## 주요 기능
 
 ### 관리
@@ -136,6 +143,16 @@ WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물
 - Docker
 - Jenkins
 - GitHub Actions
+
+## 🛠 기술 스택 (Tech Stack)
+
+| 구분 | 사용 기술 |
+|------|----------|
+| **Frontend** | ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=Thymeleaf&logoColor=white) |
+| **Backend** | ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white) |
+| **Data & ORM** | ![Oracle](https://img.shields.io/badge/Oracle-F00000?style=for-the-badge&logo=oracle&logoColor=white) ![JPA](https://img.shields.io/badge/JPA-59666C?style=for-the-badge) ![MyBatis](https://img.shields.io/badge/MyBatis-000000?style=for-the-badge) |
+| **Cloud & Storage**| ![AWS S3](https://img.shields.io/badge/Amazon_S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white) |
+| **Collaboration** | ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white) |
 
 ## 프로젝트 구조
 
