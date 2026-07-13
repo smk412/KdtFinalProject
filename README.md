@@ -94,7 +94,7 @@ WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물
 <img width="1920" height="945" alt="메인화면" src="https://github.com/user-attachments/assets/2ab4bf2b-ef1f-4a08-aa0d-4b9ba5b9a59d" />
 
 ### 시스템 구성도
-![Uploading weple_system_architecture_v2.png…]()
+<img width="3600" height="1920" alt="weple_system_architecture_v2" src="https://github.com/user-attachments/assets/cbc76718-faa3-4d00-9467-f0f82d897a95" />
 
 ### 자료 흐름도
 <img width="2720" height="2000" alt="weple_dfd_v2_white_bg" src="https://github.com/user-attachments/assets/3230e7e4-c6f0-4313-8028-587dd1ee870a" />
