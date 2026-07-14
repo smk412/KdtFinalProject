@@ -201,7 +201,7 @@ WEPLE은 프로젝트 수행 과정에서 발생하는 일정, 일감, 산출물
 - GitHub Actions
 
 ### Dev Tools
-- IntelliJ IDEA
+- Eclipse
 - Oracle SQL Developer
 
 ### Collaboration
