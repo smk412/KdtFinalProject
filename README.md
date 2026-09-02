@@ -1,7 +1,6 @@
 # WEPLE
 
-> 프로젝트와 업무를 한곳에서 관리하는 협업 플랫폼  
-> 팀 프로젝트에서 마일스톤·로드맵·간트 차트·대시보드 개발과 조회 성능 개선을 담당했습니다.
+> 프로젝트와 업무를 한곳에서 관리하는 웹 기반 협업 플랫폼
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk&logoColor=white">
@@ -16,9 +15,9 @@
 
 ## 프로젝트 소개
 
-WEPLE은 기업과 개발 조직에서 프로젝트, 일감, 마일스톤, 일정 및 협업 이력을 통합 관리할 수 있도록 개발한 웹 기반 협업 플랫폼입니다.
+WEPLE은 기업과 개발 조직에서 프로젝트, 일감, 마일스톤, 일정 및 협업 이력을 통합 관리할 수 있도록 개발한 협업 플랫폼입니다.
 
-프로젝트별 업무 현황을 대시보드에서 확인하고, 마일스톤과 간트 차트를 통해 전체 개발 일정을 관리할 수 있습니다. 역할 및 권한에 따라 접근 가능한 기능을 구분하고, GitHub 저장소·파일·위키·알림 기능을 함께 제공하도록 구성했습니다.
+프로젝트별 업무 현황을 대시보드에서 확인하고, 마일스톤과 간트 차트를 이용해 개발 일정을 관리할 수 있습니다. 역할별 권한 관리와 GitHub 저장소, 위키, 파일, 알림 기능도 함께 제공합니다.
 
 - 개발 기간: 2026.06 ~ 2026.07
 - 개발 인원: 5명
@@ -27,7 +26,7 @@ WEPLE은 기업과 개발 조직에서 프로젝트, 일감, 마일스톤, 일�
 - 개인 GitHub: [github.com/smk412](https://github.com/smk412)
 
 > 이 저장소는 팀 프로젝트를 개인 포트폴리오 목적으로 포크한 저장소입니다.  
-> 아래 내용은 전체 프로젝트 소개와 함께 제가 담당한 기능 및 기술적 개선 사항을 중심으로 정리했습니다.
+> 프로젝트 전체 기능과 함께 제가 담당한 개발 영역과 문제 해결 경험을 중심으로 정리했습니다.
 
 ---
 
@@ -35,32 +34,31 @@ WEPLE은 기업과 개발 조직에서 프로젝트, 일감, 마일스톤, 일�
 
 ### 프로젝트 및 업무 관리
 
-- 프로젝트 생성 및 구성원 관리
+- 프로젝트 생성과 구성원 관리
 - 일감 등록·수정·삭제 및 담당자 지정
-- 일감 상태·우선순위·유형별 관리
-- 칸반 보드와 프로젝트 진행 현황 제공
+- 일감 상태·우선순위·유형 관리
+- 프로젝트 칸반 보드 제공
 
 ### 마일스톤 및 로드맵
 
-- 상위 버전과 하위 마일스톤 계층 관리
-- 마일스톤별 연결 일감 관리
-- 완료 일감 수와 평균 진척도 계산
-- 마감일을 기준으로 지연 일수 표시
-- 프로젝트 단위 로드맵 조회
+- 상위 버전과 하위 마일스톤 관리
+- 마일스톤별 일감 연결
+- 완료 일감과 평균 진척도 계산
+- 목표 완료일 기준 지연 일수 표시
+- 프로젝트 단위 로드맵 제공
 
 ### 일정 및 현황 시각화
 
-- 간트 차트를 이용한 프로젝트 일정 확인
-- 프로젝트 개요 및 전체 진행률 제공
-- 대시보드에서 참여 프로젝트와 최근 활동 조회
-- 마감 임박·지연 일감 추적
+- 간트 차트를 통한 일정 확인
+- 프로젝트 전체 진행률 제공
+- 대시보드에서 참여 프로젝트 조회
+- 최근 활동과 마감 일감 추적
 
-### 협업 지원
+### 협업 및 관리
 
-- GitHub 저장소 및 커밋 정보 조회
-- 프로젝트 위키
-- 파일 업로드 및 관리
-- 알림 및 업무 이력 조회
+- GitHub 저장소와 커밋 정보 조회
+- 프로젝트 위키와 파일 관리
+- 사용자 알림 및 활동 이력
 - 사용자·그룹·역할·권한 관리
 
 ---
@@ -69,92 +67,87 @@ WEPLE은 기업과 개발 조직에서 프로젝트, 일감, 마일스톤, 일�
 
 ## 송민규 — Backend / Full Stack
 
-프로젝트에서 Git 협업 관리와 함께 다음 기능을 주로 담당했습니다.
+프로젝트에서 Git 협업 관리와 함께 다음 기능을 담당했습니다.
 
 | 담당 영역 | 주요 내용 |
 |---|---|
-| 마일스톤 | 등록·조회·수정·삭제, 상위 버전과 하위 마일스톤 계층 관리 |
-| 로드맵 | 프로젝트별 마일스톤·일감 통계 조회 및 화면 구성 |
-| 조회 최적화 | 복잡한 계층형 SQL 분리, 복합 인덱스 적용, Java Map 기반 트리 조립 |
-| 간트 차트 | 프로젝트 일정과 일감 데이터를 간트 차트 구조로 변환 |
-| 프로젝트 개요 | 프로젝트 진행률, 구성원 및 일감 현황 조회 |
+| 마일스톤 | 상위 버전 및 하위 마일스톤 CRUD |
+| 로드맵 | 마일스톤 계층, 일감 통계, 진척도 및 지연일 조회 |
+| DB 조회 개선 | 복합 인덱스 적용 및 로드맵 조회 구조 단순화 |
+| 권한 처리 | 프로젝트 멤버십·Role·Permission 기반 접근 제어 |
+| 간트 차트 | 프로젝트 일정과 일감 계층 데이터 구성 |
+| 프로젝트 개요 | 진행률, 구성원 및 일감 현황 조회 |
 | 대시보드 | 참여 프로젝트, 최근 활동, 마감 일감 조회 |
-| 일감 유형 | 일감 유형 등록·조회·수정 및 관리 UI 구현 |
-| 권한 처리 | 프로젝트 구성원 및 권한 코드 기반 접근 제어 |
-| 통합 테스트 | 삭제 일감 제외, 권한 및 화면 결함 수정 |
+| 일감 유형 | 일감 유형 등록·조회·수정 및 관리 화면 |
+| 통합 테스트 | 삭제 일감, 권한 검증 및 화면 결함 수정 |
 
-### 기여 범위
+### 개발 흐름
 
 ```text
-Milestone
-├─ 상위 버전 등록
-├─ 하위 마일스톤 CRUD
-├─ 마일스톤별 일감 연결
-├─ 상태·진척도·지연일 계산
-├─ 로드맵 계층 조회
-└─ 프로젝트 권한 검증
-
-Project Visualization
-├─ 프로젝트 개요
-├─ 간트 차트
-└─ 대시보드
-
-System
-├─ 일감 유형 관리
-└─ 역할·권한 기반 접근 제어
+일감 유형 관리
+    ↓
+마일스톤 CRUD
+    ↓
+상위 버전과 하위 마일스톤 계층 구성
+    ↓
+마일스톤 상세 및 일감 연결
+    ↓
+로드맵 조회 성능 개선
+    ↓
+프로젝트 권한 적용
+    ↓
+간트 차트·프로젝트 개요·대시보드 연동
+    ↓
+통합 테스트 및 결함 수정
 ```
 
 ---
 
-# 핵심 개선 사례
+# 주요 개발 내용
 
-## 마일스톤 로드맵 조회 최적화
+## 1. 마일스톤 및 로드맵
 
-### 문제 상황
+프로젝트 일정을 상위 버전과 하위 마일스톤으로 나누어 관리할 수 있도록 마일스톤 기능을 구현했습니다.
 
-기존 로드맵 조회는 하나의 SQL 안에서 다음 작업을 모두 처리했습니다.
-
-- 부모 마일스톤 조회
-- 자식 마일스톤 self join
-- 마일스톤별 일감 통계 집계
-- 부모 버전의 통계 재집계
-- 부모·자식 계층 결과 생성
-- 지연일 계산
-
-```sql
-FROM milestone parent
-LEFT JOIN (
-    -- 자식 마일스톤 및 일감 통계 집계
-) parent_stats
-    ON parent.milestone_id = parent_stats.parent_milestone_id
-LEFT JOIN milestone child
-    ON parent.milestone_id = child.parent_milestone_id
-LEFT JOIN (
-    -- 자식 마일스톤별 일감 통계 집계
-) task_stats
-    ON child.milestone_id = task_stats.milestone_id
-WHERE parent.project_id = #{projectId}
-  AND parent.parent_milestone_id IS NULL
+```text
+상위 버전
+├─ 하위 마일스톤
+│  ├─ 연결 일감
+│  ├─ 전체·완료 일감 수
+│  ├─ 평균 진척도
+│  └─ 지연 일수
+└─ 하위 마일스톤 통계 합산
 ```
 
-이 구조에는 다음 문제가 있었습니다.
+주요 구현 내용은 다음과 같습니다.
 
-1. `milestone`과 `task` 테이블을 여러 번 조회했습니다.
-2. 부모 마일스톤 정보가 자식 수만큼 중복되어 반환됐습니다.
-3. self join과 중첩 집계 때문에 실행 계획이 복잡해졌습니다.
-4. DB가 조회뿐 아니라 계층 구조 생성과 통계 계산까지 담당했습니다.
-5. 데이터가 증가할수록 DB 연산과 MyBatis 결과 매핑 부담이 커지는 구조였습니다.
+- 상위 버전 등록·조회·수정·삭제
+- 하위 마일스톤 등록 및 상위 버전 연결
+- 마일스톤에 일감 연결·해제
+- 일감 평균 진척도 계산
+- 완료된 하위 마일스톤 수 계산
+- 목표 완료일이 지난 마일스톤의 지연 일수 계산
+- 마일스톤 상세 화면 페이징 및 통계 제공
 
-### 1. 조회 조건에 맞춘 복합 인덱스 구성
+---
 
-로드맵은 항상 특정 프로젝트 안에서 최상위 버전과 하위 마일스톤을 조회합니다.
+## 2. 로드맵 DB 조회 최적화
 
-```sql
-WHERE project_id = :projectId
-  AND parent_milestone_id IS NULL
-```
+### 문제
 
-이 조회 패턴에 맞춰 복합 인덱스를 구성했습니다.
+기존 로드맵 조회는 하나의 SQL에서 부모·자식 마일스톤 조회와 일감 통계를 모두 처리했습니다.
+
+이 과정에서 다음 문제가 발생했습니다.
+
+- 마일스톤 및 일감 테이블 Full Table Scan 가능성
+- 부모·자식 마일스톤 Self Join
+- 일감 통계와 부모 통계의 중첩 집계
+- 자식 수만큼 부모 데이터가 중복 반환
+- 데이터 증가에 따라 조회 지연 발생
+
+### 개선
+
+조회 조건에 맞춰 다음 복합 인덱스를 적용했습니다.
 
 ```sql
 CREATE INDEX IDX_MILESTONE_ROADMAP
@@ -164,221 +157,120 @@ ON MILESTONE (
 );
 ```
 
-이를 통해 전체 마일스톤을 탐색하기 전에 프로젝트 범위를 먼저 좁히고, 해당 프로젝트 안에서 부모 또는 자식 마일스톤을 조회할 수 있도록 했습니다.
+이후 하나의 복잡한 SQL을 두 개의 평면 조회로 분리했습니다.
 
-### 2. 복잡한 SQL을 평면 조회 두 개로 분리
-
-#### 프로젝트 마일스톤 조회
-
-```xml
-<select id="selectFlatMilestones" resultType="MilestoneVO">
-    SELECT
-        milestone_id         AS milestoneId,
-        project_id           AS projectId,
-        user_code            AS userCode,
-        milestone_title      AS milestoneTitle,
-        milestone_describe   AS milestoneDescribe,
-        finish_date          AS finishDate,
-        milestone_status     AS milestoneStatus,
-        created_at           AS createdAt,
-        updated_at           AS updatedAt,
-        parent_milestone_id  AS parentMilestoneId
-    FROM milestone
-    WHERE project_id = #{projectId}
-</select>
+```text
+1. 특정 프로젝트의 마일스톤 목록 조회
+2. 해당 프로젝트의 마일스톤별 일감 통계 조회
+3. Java에서 milestoneId 기준으로 통계 연결
+4. parentMilestoneId 기준으로 부모·자식 구조 구성
 ```
 
-부모·자식 self join을 제거하고 마일스톤마다 한 행만 반환하도록 변경했습니다.
-
-#### 마일스톤별 일감 통계 조회
-
-```xml
-<select id="selectTaskStatsFlat" resultType="TaskStatDTO">
-    SELECT
-        milestone_id AS milestoneId,
-        COUNT(*) AS totalTaskCount,
-        COUNT(
-            CASE WHEN task_progress = 100 THEN 1 END
-        ) AS closedTaskCount,
-        ROUND(
-            AVG(NVL(task_progress, 0))
-        ) AS progressPercentage
-    FROM task
-    WHERE project_id = #{projectId}
-      AND milestone_id IS NOT NULL
-      AND deleted_yn = 'N'
-    GROUP BY milestone_id
-</select>
-```
-
-프로젝트 범위를 먼저 제한하고, 삭제되지 않은 일감만 마일스톤별로 한 번씩 집계했습니다.
-
-### 3. 통계 결과를 Map으로 변환
+Java에서는 마일스톤과 통계를 Map으로 변환하여 반복 탐색 없이 연결했습니다.
 
 ```java
-List<MilestoneVO> flatMilestones =
-        milestoneMapper.selectFlatMilestones(projectId);
-
-List<TaskStatDTO> taskStats =
-        milestoneMapper.selectTaskStatsFlat(projectId);
-
 Map<Long, TaskStatDTO> statMap = taskStats.stream()
         .collect(Collectors.toMap(
                 TaskStatDTO::getMilestoneId,
                 stat -> stat
         ));
-```
 
-통계 결과를 `milestoneId` 기준 Map으로 변환하여 각 마일스톤의 통계를 반복 탐색하지 않고 연결할 수 있도록 했습니다.
-
-```java
-TaskStatDTO stat = statMap.get(milestone.getMilestoneId());
-
-if (stat != null) {
-    info.setTotalTaskCount(stat.getTotalTaskCount());
-    info.setClosedTaskCount(stat.getClosedTaskCount());
-    info.setProgressPercentage(stat.getProgressPercentage());
-}
-```
-
-### 4. Java에서 계층 구조 조립
-
-```java
 Map<Long, MilestoneInfoVO> milestoneMap = infoList.stream()
         .collect(Collectors.toMap(
                 MilestoneInfoVO::getMilestoneId,
                 milestone -> milestone
         ));
-
-List<MilestoneInfoVO> versions = new ArrayList<>();
-
-for (MilestoneInfoVO milestone : infoList) {
-    if (milestone.getParentMilestoneId() == null) {
-        versions.add(milestone);
-        continue;
-    }
-
-    MilestoneInfoVO parent = milestoneMap.get(
-            milestone.getParentMilestoneId().longValue()
-    );
-
-    if (parent != null) {
-        parent.getChildMilestones().add(milestone);
-    }
-}
 ```
-
-DB에서 중복된 계층형 결과를 생성하는 대신, `milestoneId`와 `parentMilestoneId`를 이용해 서비스 계층에서 트리를 구성했습니다.
-
-Map을 사용해 부모를 바로 찾기 때문에 전체 조립 과정은 마일스톤 수를 N이라고 했을 때 O(N)에 가까운 구조입니다.
-
-### 5. 부모 버전 통계 계산
-
-```java
-for (MilestoneInfoVO parent : versions) {
-    List<MilestoneInfoVO> children =
-            parent.getChildMilestones();
-
-    if (children.isEmpty()) {
-        continue;
-    }
-
-    parent.setTotalMilestoneCount(children.size());
-
-    long closedCount = children.stream()
-            .filter(child ->
-                    "g2".equals(child.getMilestoneStatus()))
-            .count();
-
-    parent.setClosedMilestoneCount((int) closedCount);
-
-    double averageProgress = children.stream()
-            .mapToInt(
-                    MilestoneInfoVO::getProgressPercentage
-            )
-            .average()
-            .orElse(0.0);
-
-    parent.setProgressPercentage(
-            (int) Math.round(averageProgress)
-    );
-}
-```
-
-기존 SQL 인라인 뷰에서 수행하던 부모 통계 계산을 서비스 계층으로 이동했습니다. 이를 통해 조회 SQL을 단순화하고, 진척도 계산 규칙을 애플리케이션 코드에서 명확히 확인할 수 있게 했습니다.
 
 ### 개선 결과
 
-| 구분 | 개선 전 | 개선 후 |
-|---|---|---|
-| SQL 구조 | self join과 중첩 집계가 포함된 단일 SQL | 마일스톤 조회와 일감 통계 조회로 분리 |
-| 반환 데이터 | 부모 정보가 자식 수만큼 중복 | 마일스톤당 한 행 |
-| 계층 구성 | DB join 및 MyBatis collection | Java Map 기반 조립 |
-| 부모 통계 | SQL 인라인 뷰에서 계산 | 서비스 계층에서 계산 |
-| 데이터 범위 | 실행 계획에 따라 광범위한 탐색 가능 | `project_id` 기준으로 우선 제한 |
-| 유지보수 | 조회와 비즈니스 계산이 혼재 | 조회와 계산 책임 분리 |
+| 개선 전 | 개선 후 |
+|---|---|
+| Full Table Scan 가능성 | 복합 인덱스 활용 |
+| 부모·자식 Self Join | Java에서 계층 구조 구성 |
+| 중첩 집계 | 일감 통계 1회 집계 |
+| 하나의 복잡한 SQL | 단순한 SQL 2개로 분리 |
+| 광범위한 데이터 탐색 | 프로젝트 단위 범위 조회 |
+| 부모 데이터 중복 반환 | 마일스톤당 한 행 반환 |
 
-> 단순히 인덱스만 추가한 것이 아니라, DB가 계층 조회와 통계 계산을 모두 담당하던 구조를 단순 조회와 애플리케이션 조립으로 분리했습니다.
+Chrome 개발자 도구의 Network 탭을 이용해 로드맵 화면 응답 시간을 비교했을 때, 개발 환경 기준으로 약 **3초에서 0.9초 수준**으로 감소했습니다.
+
+> 해당 수치는 별도의 부하 테스트 도구로 측정한 공식 벤치마크가 아니라, 동일한 개발 환경에서 기능 개선 전후를 확인한 체감 측정 결과입니다.
 
 ---
 
-## 삭제 일감의 통계 반영 문제 해결
+## 3. 프로젝트 Role·Permission 권한 처리
 
 ### 문제
 
-일감을 논리 삭제해도 기존 통계 쿼리가 삭제된 일감을 포함해 집계하는 문제가 있었습니다.
+로그인 여부만 확인하면 사용자가 URL을 직접 입력하거나 요청을 변조해 참여하지 않은 프로젝트 또는 권한이 없는 기능에 접근할 수 있었습니다.
 
-그 결과 화면에서는 삭제된 일감이 보이지 않지만 다음 값에는 계속 포함될 수 있었습니다.
+또한 프로젝트마다 사용자가 맡는 역할이 다르기 때문에 사용자 계정에 고정된 권한만으로는 프로젝트별 접근 권한을 표현하기 어려웠습니다.
 
-- 전체 일감 수
-- 완료 일감 수
-- 평균 진척도
-- 간트 차트 및 프로젝트 개요 통계
+### 권한 모델
 
-### 해결
+사용자에게 권한을 직접 부여하지 않고, 프로젝트 구성원에게 Role을 부여하고 Role에 Permission을 연결하는 구조를 적용했습니다.
 
-일감 조회와 통계 쿼리에 논리 삭제 조건을 일관되게 추가했습니다.
-
-```sql
-AND deleted_yn = 'N'
+```text
+User
+  ↓
+Project Member
+  ↓
+Member Role
+  ↓
+Role
+  ↓
+Role Permission
+  ↓
+Permission
 ```
 
-```sql
-SELECT
-    milestone_id,
-    COUNT(*) AS total_task_count,
-    ROUND(AVG(NVL(task_progress, 0))) AS progress_percentage
-FROM task
-WHERE project_id = #{projectId}
-  AND milestone_id IS NOT NULL
-  AND deleted_yn = 'N'
-GROUP BY milestone_id
+테이블 관계는 다음과 같습니다.
+
+```text
+USERS
+  │
+  └─ MEMBERS
+       │
+       └─ MEMBER_ROLES
+            │
+            └─ ROLES
+                 │
+                 └─ ROLE_PERMISSIONS
+                      │
+                      └─ PERMISSIONS
 ```
 
-이를 통해 실제 화면에 노출되는 일감과 통계에 사용되는 일감의 범위를 일치시켰습니다.
+### 요청 검증 흐름
 
----
-
-## 프로젝트 접근 권한 처리
-
-프로젝트 기능에 접근할 때 단순 로그인 여부만 확인하지 않고 다음 조건을 함께 검증하도록 구현했습니다.
-
-- 해당 프로젝트 구성원인지 확인
-- 사용자에게 부여된 역할 조회
-- 역할에 연결된 권한 코드 확인
-- 조회·등록·수정·삭제 작업별 접근 허용
-
-```java
-boolean projectMember =
-        milestoneService.checkProjectMembership(
-                projectId,
-                loginUser.getUserCode()
-        );
-
-if (!projectMember) {
-    return "redirect:/access-denied";
-}
+```mermaid
+flowchart LR
+    A[로그인 사용자] --> B{프로젝트 구성원인가?}
+    B -- 아니요 --> C[접근 거부]
+    B -- 예 --> D[프로젝트에서 부여된 Role 조회]
+    D --> E[Role에 연결된 Permission 조회]
+    E --> F{요청 작업 권한이 있는가?}
+    F -- 아니요 --> C
+    F -- 예 --> G[READ / CREATE / UPDATE / DELETE 수행]
 ```
+
+실제 요청은 다음 순서로 검증했습니다.
+
+```text
+사용자 인증
+    ↓
+프로젝트 구성원 확인
+    ↓
+프로젝트에서 부여된 Role 확인
+    ↓
+Role에 연결된 Permission 코드 조회
+    ↓
+요청 작업에 필요한 권한 검증
+    ↓
+허용 또는 접근 거부
+```
+
+### 1단계: 프로젝트 구성원 확인
 
 ```sql
 SELECT COUNT(*)
@@ -387,38 +279,145 @@ WHERE project_id = #{projectId}
   AND user_code = #{userCode}
 ```
 
-마일스톤, 간트 차트, 프로젝트 개요 등 프로젝트에 종속된 화면에 동일한 접근 검증 방식을 적용해 URL 직접 접근도 제한했습니다.
+프로젝트 구성원이 아니면 Role과 Permission을 조회하기 전에 접근을 차단했습니다.
+
+```java
+if (!hasProjectAccess(loginUser, projectId)) {
+    return "weple/access-denide";
+}
+```
+
+### 2단계: Role을 통한 Permission 조회
+
+```sql
+SELECT DISTINCT rp.permission_code
+FROM members m
+JOIN member_roles mr
+  ON m.member_id = mr.member_id
+JOIN role_permissions rp
+  ON mr.role_id = rp.role_id
+WHERE m.user_code = #{userCode}
+  AND m.project_id = #{projectId}
+```
+
+사용자와 프로젝트를 조건으로 구성원에게 부여된 Role을 찾고, 해당 Role이 가진 Permission 코드 목록을 조회했습니다.
+
+### 3단계: 요청 작업별 권한 검증
+
+```java
+Set<String> permissionCodes =
+        findMilestonePermissionCodes(loginUser, projectId);
+
+if (!hasMilestonePermission(
+        permissionCodes,
+        PERMISSION_MILESTONE_CREATE_UPDATE_DELETE
+)) {
+    return "weple/access-denide";
+}
+```
+
+권한 코드는 기능과 행위에 따라 구분했습니다.
+
+```java
+private static final String PERMISSION_MILESTONE_CREATE_UPDATE_DELETE
+        = "k1_version";
+
+private static final String PERMISSION_TASK_CREATE
+        = "k3_add";
+
+private static final String PERMISSION_TASK_UPDATE
+        = "k3_edit";
+
+private static final String PERMISSION_TASK_MYUPDATE
+        = "k3_myedit";
+```
+
+### 화면과 서버의 이중 검증
+
+조회한 권한은 화면 버튼 노출에도 사용했습니다.
+
+```java
+model.addAttribute(
+        "canAddTask",
+        hasMilestonePermission(
+                permissionCodes,
+                PERMISSION_TASK_CREATE
+        )
+);
+```
+
+하지만 버튼을 숨기는 것만으로는 요청 조작을 막을 수 없으므로, 실제 등록·수정·삭제 요청을 처리하는 Controller에서도 같은 Permission을 다시 검사했습니다.
+
+```text
+화면 권한 검증
+└─ 권한이 없는 버튼과 메뉴를 숨김
+
+서버 권한 검증
+└─ URL 직접 접근 및 변조된 요청을 차단
+```
+
+### 권한 처리 결과
+
+- 프로젝트 비구성원의 URL 직접 접근 차단
+- 프로젝트별로 서로 다른 Role 부여 가능
+- Role에 따라 기능별 Permission 구성 가능
+- 조회·등록·수정·삭제 요청을 Controller에서 검증
+- 권한이 없는 버튼을 화면에서 비활성화
+- 화면 조작과 관계없이 서버에서 최종 접근 차단
 
 ---
 
-## 간트 차트 및 프로젝트 개요
+## 4. 삭제 일감과 통계 정합성 개선
 
-프로젝트에 등록된 일감과 마일스톤 정보를 조회한 뒤 화면에서 사용할 수 있는 계층형 데이터로 변환했습니다.
+일감을 논리 삭제해도 기존 통계에는 삭제된 일감이 포함되는 문제가 있었습니다.
 
-주요 처리 내용은 다음과 같습니다.
+그 결과 화면에서는 보이지 않는 일감이 다음 값에 계속 반영될 수 있었습니다.
+
+- 전체 일감 수
+- 완료 일감 수
+- 평균 진척도
+- 간트 차트
+- 프로젝트 개요와 대시보드 통계
+
+관련 조회 조건에 논리 삭제 여부를 적용했습니다.
+
+```sql
+AND deleted_yn = 'N'
+```
+
+이를 통해 화면에 노출되는 데이터와 통계에 반영되는 데이터의 범위를 일치시켰습니다.
+
+---
+
+## 5. 간트 차트 및 프로젝트 개요
+
+프로젝트의 마일스톤과 일감을 일정 관점에서 확인할 수 있도록 조회 결과를 간트 차트용 계층 데이터로 변환했습니다.
+
+주요 구현 내용은 다음과 같습니다.
 
 - 프로젝트별 일감 조회
 - 상위·하위 일감 관계 구성
-- 시작일과 종료일을 기준으로 간트 차트 데이터 생성
+- 시작일과 종료일을 이용한 간트 차트 데이터 생성
 - 삭제된 일감 제외
 - 프로젝트 구성원 및 그룹별 현황 조회
 - 프로젝트 전체 진행률 계산
-- 조회 결과를 DTO로 분리해 화면 전달 구조 단순화
+- DTO를 이용한 조회 결과와 화면 모델 분리
+- 프로젝트 구성원 및 Permission 기반 접근 제한
 
 ---
 
-## 대시보드
+## 6. 대시보드
 
-로그인한 사용자를 기준으로 다음 정보를 한 화면에서 확인할 수 있도록 구현했습니다.
+로그인한 사용자가 참여 중인 프로젝트와 주요 업무 현황을 한 화면에서 확인할 수 있도록 대시보드를 구현했습니다.
 
-- 참여 중인 프로젝트
+- 참여 프로젝트 조회
 - 프로젝트별 일감 현황
-- 최근 활동
+- 최근 활동 내역
 - 마감 예정 및 지연 일감
-- 사용자 프로필
 - 프로젝트 진행 상태
+- 사용자 프로필 정보
 
-대시보드 조회에서도 전체 데이터를 가져온 뒤 필터링하지 않고 사용자 및 프로젝트 조건을 SQL에 적용해 필요한 데이터만 조회하도록 구성했습니다.
+전체 데이터를 가져와 애플리케이션에서 필터링하지 않고 사용자와 프로젝트 조건을 SQL에 적용해 필요한 범위만 조회했습니다.
 
 ---
 
@@ -459,7 +458,7 @@ WHERE project_id = #{projectId}
 
 ---
 
-## 애플리케이션 구조
+## 프로젝트 구조
 
 ```text
 src/main/java/com/weple/cloud
@@ -481,11 +480,6 @@ src/main/java/com/weple/cloud
 
 src/main/resources
 ├─ mapper
-│  ├─ dashboard
-│  ├─ gantt
-│  ├─ milestone
-│  ├─ project
-│  └─ task
 ├─ static
 ├─ templates
 └─ application.properties
@@ -504,7 +498,7 @@ src/main/resources
 | Maven | 3.9.x |
 | Database | Oracle |
 | WAS | Embedded Tomcat |
-| 기본 포트 | 8073 |
+| 로컬 포트 | 8073 |
 | 운영 포트 | 80 |
 
 ### 로컬 실행
@@ -522,7 +516,7 @@ mvn clean package
 java -jar target/weple-0.0.1-SNAPSHOT.jar
 ```
 
-> 데이터베이스 및 외부 서비스 인증정보는 보안상 저장소에 공개하지 않습니다.
+> 데이터베이스와 외부 서비스 인증정보는 보안상 저장소에 공개하지 않습니다.
 
 ---
 
@@ -536,22 +530,23 @@ java -jar target/weple-0.0.1-SNAPSHOT.jar
 | 김민지 | 개발환경 |
 | **송민규** | **Git 협업 관리 / 마일스톤·로드맵·간트 차트·대시보드 개발** |
 
-팀원 전체의 협업으로 완성한 프로젝트이며, 이 README는 그중 송민규의 담당 기능과 기술적 개선 경험을 중심으로 정리했습니다.
+팀원 전체의 협업으로 완성한 프로젝트이며, 이 README는 그중 송민규의 담당 기능과 문제 해결 경험을 중심으로 정리했습니다.
 
 ---
 
 ## 회고
 
-WEPLE을 개발하면서 단순히 기능이 동작하는 것과 데이터가 증가해도 안정적으로 동작하는 것은 다른 문제라는 점을 경험했습니다.
+WEPLE을 개발하면서 기능 구현뿐 아니라 데이터 증가, 권한 범위, 통계 정합성까지 함께 고려해야 한다는 점을 배웠습니다.
 
-특히 마일스톤 로드맵 조회에서는 복잡한 SQL 하나로 모든 문제를 해결하려 했지만, self join과 중첩 집계로 인해 조회 구조가 복잡해졌습니다. 이를 해결하는 과정에서 다음 내용을 학습했습니다.
+로드맵 조회에서는 복잡한 SQL 하나로 모든 결과를 만들던 구조를 인덱스 기반의 단순 조회와 Java 계층 조립 방식으로 변경했습니다. 이 과정에서 쿼리의 복잡도를 줄이는 것과 DB·애플리케이션 사이의 책임을 적절하게 분배하는 것이 중요하다는 점을 경험했습니다.
 
-- 조회 조건과 컬럼 순서를 고려한 복합 인덱스 설계
-- SQL 집계 범위를 줄이기 위한 조건절 배치
-- DB와 애플리케이션 사이의 책임 분리
-- Map을 이용한 선형 시간 계층 구조 구성
+권한 처리에서는 단순 로그인 확인을 넘어 프로젝트 구성원, Role, Permission으로 이어지는 접근 제어 흐름을 설계했습니다. 화면에서 버튼을 숨기는 것만으로 끝내지 않고 Controller에서 실제 요청 권한을 다시 검사해 URL 직접 접근과 변조 요청을 차단했습니다.
+
+이 경험을 통해 다음 역량을 키울 수 있었습니다.
+
+- 조회 패턴을 고려한 복합 인덱스 설계
+- 복잡한 SQL의 책임 분리
+- Map 기반 계층 데이터 구성
+- Role·Permission 기반 접근 제어
 - 논리 삭제 데이터와 통계 정합성 관리
-- 프로젝트 구성원 및 역할 기반 접근 제어
-- 통합 테스트 과정에서 발생한 데이터·화면 결함 수정
-
-이 경험을 통해 SQL을 단순히 작성하는 것을 넘어, 실행 과정과 반환 데이터 구조까지 고려해 설계하는 것이 중요하다는 점을 배웠습니다.
+- 통합 테스트를 통한 기능 간 결함 발견 및 수정
