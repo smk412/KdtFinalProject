@@ -186,186 +186,68 @@ Map<Long, MilestoneInfoVO> milestoneMap = infoList.stream()
 
 | 개선 전 | 개선 후 |
 |---|---|
-| Full Table Scan 가능성 | 복합 인덱스 활용 |
-| 부모·자식 Self Join | Java에서 계층 구조 구성 |
-| 중첩 집계 | 일감 통계 1회 집계 |
-| 하나의 복잡한 SQL | 단순한 SQL 2개로 분리 |
-| 광범위한 데이터 탐색 | 프로젝트 단위 범위 조회 |
-| 부모 데이터 중복 반환 | 마일스톤당 한 행 반환 |
+| 전체 데이터를 대상으로 복잡한 조회 수행 | 복합 인덱스를 활용한 프로젝트 범위 조회 |
+| Self Join과 중첩 집계를 하나의 SQL에서 처리 | 마일스톤과 일감 통계를 SQL 2개로 분리 |
+| DB에서 계층 구조까지 생성 | Java에서 부모·자식 구조 조립 |
 
-Chrome 개발자 도구의 Network 탭을 이용해 로드맵 화면 응답 시간을 비교했을 때, 개발 환경 기준으로 약 **3초에서 0.9초 수준**으로 감소했습니다.
+**로드맵 응답 시간을 개발 환경 기준 약 3초에서 0.9초로 단축했습니다.**
 
-> 해당 수치는 별도의 부하 테스트 도구로 측정한 공식 벤치마크가 아니라, 동일한 개발 환경에서 기능 개선 전후를 확인한 체감 측정 결과입니다.
+※ Chrome 개발자 도구 Network 탭에서 동일 기능의 개선 전후 응답 시간을 비교한 결과이며, 별도의 부하 테스트를 통한 공식 벤치마크는 아닙니다.
 
 ---
 
 ## 3. 프로젝트 Role·Permission 권한 처리
 
-### 문제
+사용자가 프로젝트마다 다른 역할과 권한을 가질 수 있도록 Role 기반 접근 제어를 적용했습니다.
 
-로그인 여부만 확인하면 사용자가 URL을 직접 입력하거나 요청을 변조해 참여하지 않은 프로젝트 또는 권한이 없는 기능에 접근할 수 있었습니다.
-
-또한 프로젝트마다 사용자가 맡는 역할이 다르기 때문에 사용자 계정에 고정된 권한만으로는 프로젝트별 접근 권한을 표현하기 어려웠습니다.
-
-### 권한 모델
-
-사용자에게 권한을 직접 부여하지 않고, 프로젝트 구성원에게 Role을 부여하고 Role에 Permission을 연결하는 구조를 적용했습니다.
+### 권한 처리 흐름
 
 ```text
-User
-  ↓
-Project Member
-  ↓
-Member Role
-  ↓
-Role
-  ↓
-Role Permission
-  ↓
-Permission
+사용자
+  → 프로젝트 구성원 확인
+  → 구성원에게 부여된 Role 조회
+  → Role에 연결된 Permission 조회
+  → READ / CREATE / UPDATE / DELETE 권한 검증
+  → 요청 허용 또는 접근 거부
 ```
 
-테이블 관계는 다음과 같습니다.
+### 권한 데이터 구조
 
 ```text
 USERS
-  │
-  └─ MEMBERS
-       │
-       └─ MEMBER_ROLES
-            │
-            └─ ROLES
-                 │
-                 └─ ROLE_PERMISSIONS
-                      │
-                      └─ PERMISSIONS
+  → MEMBERS
+  → MEMBER_ROLES
+  → ROLES
+  → ROLE_PERMISSIONS
+  → PERMISSIONS
 ```
 
-### 요청 검증 흐름
-
-```mermaid
-flowchart LR
-    A[로그인 사용자] --> B{프로젝트 구성원인가?}
-    B -- 아니요 --> C[접근 거부]
-    B -- 예 --> D[프로젝트에서 부여된 Role 조회]
-    D --> E[Role에 연결된 Permission 조회]
-    E --> F{요청 작업 권한이 있는가?}
-    F -- 아니요 --> C
-    F -- 예 --> G[READ / CREATE / UPDATE / DELETE 수행]
-```
-
-실제 요청은 다음 순서로 검증했습니다.
-
-```text
-사용자 인증
-    ↓
-프로젝트 구성원 확인
-    ↓
-프로젝트에서 부여된 Role 확인
-    ↓
-Role에 연결된 Permission 코드 조회
-    ↓
-요청 작업에 필요한 권한 검증
-    ↓
-허용 또는 접근 거부
-```
-
-### 1단계: 프로젝트 구성원 확인
-
-```sql
-SELECT COUNT(*)
-FROM members
-WHERE project_id = #{projectId}
-  AND user_code = #{userCode}
-```
-
-프로젝트 구성원이 아니면 Role과 Permission을 조회하기 전에 접근을 차단했습니다.
+### 구현 구조
 
 ```java
-if (!hasProjectAccess(loginUser, projectId)) {
-    return "weple/access-denide";
+// 실제 권한 처리 과정을 단순화한 예시
+if (!isProjectMember(userCode, projectId)) {
+    return accessDenied();
 }
-```
 
-### 2단계: Role을 통한 Permission 조회
+Set<String> permissions =
+        findProjectPermissions(userCode, projectId);
 
-```sql
-SELECT DISTINCT rp.permission_code
-FROM members m
-JOIN member_roles mr
-  ON m.member_id = mr.member_id
-JOIN role_permissions rp
-  ON mr.role_id = rp.role_id
-WHERE m.user_code = #{userCode}
-  AND m.project_id = #{projectId}
-```
-
-사용자와 프로젝트를 조건으로 구성원에게 부여된 Role을 찾고, 해당 Role이 가진 Permission 코드 목록을 조회했습니다.
-
-### 3단계: 요청 작업별 권한 검증
-
-```java
-Set<String> permissionCodes =
-        findMilestonePermissionCodes(loginUser, projectId);
-
-if (!hasMilestonePermission(
-        permissionCodes,
-        PERMISSION_MILESTONE_CREATE_UPDATE_DELETE
-)) {
-    return "weple/access-denide";
+if (!permissions.contains(requiredPermission)) {
+    return accessDenied();
 }
+
+return executeRequest();
 ```
 
-권한 코드는 기능과 행위에 따라 구분했습니다.
+화면에서는 권한이 없는 버튼을 숨기고, 서버에서는 요청 권한을 다시 검증하여 URL 직접 접근과 변조 요청을 차단했습니다.
 
-```java
-private static final String PERMISSION_MILESTONE_CREATE_UPDATE_DELETE
-        = "k1_version";
+### 적용 결과
 
-private static final String PERMISSION_TASK_CREATE
-        = "k3_add";
-
-private static final String PERMISSION_TASK_UPDATE
-        = "k3_edit";
-
-private static final String PERMISSION_TASK_MYUPDATE
-        = "k3_myedit";
-```
-
-### 화면과 서버의 이중 검증
-
-조회한 권한은 화면 버튼 노출에도 사용했습니다.
-
-```java
-model.addAttribute(
-        "canAddTask",
-        hasMilestonePermission(
-                permissionCodes,
-                PERMISSION_TASK_CREATE
-        )
-);
-```
-
-하지만 버튼을 숨기는 것만으로는 요청 조작을 막을 수 없으므로, 실제 등록·수정·삭제 요청을 처리하는 Controller에서도 같은 Permission을 다시 검사했습니다.
-
-```text
-화면 권한 검증
-└─ 권한이 없는 버튼과 메뉴를 숨김
-
-서버 권한 검증
-└─ URL 직접 접근 및 변조된 요청을 차단
-```
-
-### 권한 처리 결과
-
-- 프로젝트 비구성원의 URL 직접 접근 차단
-- 프로젝트별로 서로 다른 Role 부여 가능
-- Role에 따라 기능별 Permission 구성 가능
-- 조회·등록·수정·삭제 요청을 Controller에서 검증
-- 권한이 없는 버튼을 화면에서 비활성화
-- 화면 조작과 관계없이 서버에서 최종 접근 차단
-
----
+- 프로젝트별 Role에 따라 사용자 권한을 다르게 적용
+- READ / CREATE / UPDATE / DELETE 작업별 접근 제어
+- 화면 제어와 서버 검증을 함께 적용
+- 비구성원과 권한 없는 사용자의 직접 요청 차단
 
 ## 4. 삭제 일감과 통계 정합성 개선
 
@@ -526,9 +408,9 @@ java -jar target/weple-0.0.1-SNAPSHOT.jar
 |---|---|
 | 방진영 | 팀장 / 프로젝트 총괄 |
 | 김병완 | 부팀장 / 배포 |
-| 김은지 | DB |
+| 김은지 | Git 협업 관리 |
 | 김민지 | 개발환경 |
-| **송민규** | **Git 협업 관리 / 마일스톤·로드맵·간트 차트·대시보드 개발** |
+| 송민규 | DB서버환경 |
 
 팀원 전체의 협업으로 완성한 프로젝트이며, 이 README는 그중 송민규의 담당 기능과 문제 해결 경험을 중심으로 정리했습니다.
 
